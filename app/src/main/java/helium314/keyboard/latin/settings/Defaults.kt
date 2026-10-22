@@ -79,7 +79,7 @@ object Defaults {
     const val PREF_SHOW_LANGUAGE_SWITCH_KEY = false
     const val PREF_LANGUAGE_SWITCH_KEY = "internal"
     const val PREF_SHOW_EMOJI_KEY = false
-    const val PREF_SHOW_DPAD_KEY = true
+    const val PREF_SHOW_DPAD_KEY = false // OpenBoard symbols layout has no dpad key
     const val PREF_VARIABLE_TOOLBAR_DIRECTION = true
     const val PREF_ADDITIONAL_SUBTYPES = "de${Separators.SET}${ExtraValue.KEYBOARD_LAYOUT_SET}=MAIN:qwerty${Separators.SETS}" +
             "fr${Separators.SET}${ExtraValue.KEYBOARD_LAYOUT_SET}=MAIN:qwertz${Separators.SETS}" +
@@ -172,7 +172,7 @@ object Defaults {
     const val PREF_SELECTED_SUBTYPE = ""
     const val PREF_URL_DETECTION = false
     const val PREF_DONT_SHOW_MISSING_DICTIONARY_DIALOG = false
-    const val PREF_TOOLBAR_MODE = "EXPANDABLE"
+    const val PREF_TOOLBAR_MODE = "SUGGESTION_STRIP" // OpenBoard-style: plain suggestion strip, no expandable toolbar
     const val PREF_TOOLBAR_HIDING_GLOBAL = true
     const val PREF_TOOLBAR_SWIPE_DOWN_TO_HIDE = false
     const val PREF_QUICK_PIN_TOOLBAR_KEYS = false

@@ -137,8 +137,13 @@ val defaultToolbarPref by lazy {
             others.joinToString(Separators.ENTRY) { it.name + Separators.KV + false }
 }
 
-val defaultPinnedToolbarPref = entries.filterNot { it == CLOSE_HISTORY }.joinToString(Separators.ENTRY) {
-    it.name + Separators.KV + false
+// OpenBoard-style strip: voice and clipboard keys permanently shown to the right of the suggestions
+// (see OpenBoard res/layout/suggestions_strip.xml: suggestions_strip_voice_key, suggestions_strip_clipboard_key)
+val defaultPinnedToolbarPref by lazy {
+    val default = listOf(VOICE, CLIPBOARD)
+    val others = entries.filterNot { it in default || it == CLOSE_HISTORY }
+    default.joinToString(Separators.ENTRY) { it.name + Separators.KV + true } + Separators.ENTRY +
+            others.joinToString(Separators.ENTRY) { it.name + Separators.KV + false }
 }
 
 val defaultClipboardToolbarPref by lazy {
