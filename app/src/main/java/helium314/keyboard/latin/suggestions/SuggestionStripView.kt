@@ -516,7 +516,13 @@ class SuggestionStripView(context: Context, attrs: AttributeSet?, defStyle: Int)
             toolbarExpandKey.isVisible = true
         } else {
             toolbarExpandKey.setImageDrawable(toolbarArrowIcon)
-            toolbarExpandKey.isVisible = toolbarIsExpandable
+            // like OpenBoard's suggestions_strip_other_key: in suggestion strip mode the left slot stays reserved
+            // (invisible) and only shows the incognito icon when incognito mode is on
+            toolbarExpandKey.visibility = when {
+                toolbarIsExpandable -> VISIBLE
+                settingsValues.mToolbarMode == ToolbarMode.SUGGESTION_STRIP -> INVISIBLE
+                else -> GONE
+            }
         }
 
         toolbarExpandKey.setOnClickListener(if (!toolbarIsExpandable) null else this)

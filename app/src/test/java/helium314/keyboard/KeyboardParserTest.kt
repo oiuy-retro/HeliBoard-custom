@@ -599,6 +599,32 @@ f""", // no newline at the end
         return builder.build() to keysInRowsField.get(builder) as ArrayList<ArrayList<KeyParams>>
     }
 
+    // symbols layouts follow OpenBoard (rows_symbols.xml / rows_symbols_shift.xml)
+    @Test fun `symbols layouts match OpenBoard`() {
+        val editorInfo = EditorInfo()
+        val subtype = SubtypeUtilsAdditional.createEmojiCapableAdditionalSubtype(Locale.ENGLISH, "qwerty", true)
+        fun rows(element: KeyboardElement) = buildKeyboard(editorInfo, subtype, element).second.map { row ->
+            row.filterNot { it.isSpacer }.map { it.mLabel ?: it.mIconName }
+        }
+        val symbols = rows(KeyboardElement.SYMBOLS)
+        println("symbols: $symbols")
+        assertEquals(4, symbols.size)
+        // first row is the number row if "number row in symbols" is enabled (default in the app), otherwise the
+        // row OpenBoard shows below the number row when its number row is enabled
+        assertTrue(symbols[0] == listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "0")
+                || symbols[0] == listOf("~", "`", "|", "•", "√", "π", "÷", "×", "¶", "∆"))
+        assertEquals(listOf("@", "#", "%", "&", "-", "+", "(", ")"), symbols[1].filterIndexed { i, _ -> i != 2 }) // index 2 is the locale currency
+        assertEquals(listOf("*", "\"", "'", ":", ";", "!", "?"), symbols[2].drop(1).dropLast(1))
+        assertEquals(listOf(",", "_", "/", "."), symbols[3].filter { it == "," || it == "_" || it == "/" || it == "." })
+        val moreSymbols = rows(KeyboardElement.SYMBOLS_SHIFTED)
+        println("more symbols: $moreSymbols")
+        assertEquals(4, moreSymbols.size)
+        assertEquals(listOf("~", "`", "|", "•", "√", "π", "÷", "×", "¶", "∆"), moreSymbols[0])
+        assertEquals(listOf("^", "°", "=", "{", "}"), moreSymbols[1].drop(4))
+        assertEquals(listOf("\\", "©", "®", "™", "℅", "[", "]"), moreSymbols[2].drop(1).dropLast(1))
+        assertEquals(listOf(",", "<", ">", "."), moreSymbols[3].filter { it == "," || it == "<" || it == ">" || it == "." })
+    }
+
     @Test fun placeholderAsOnlyPopup() { // https://github.com/HeliBorg/HeliBoard/issues/1324
         val keyParams = LayoutParser.parseJsonString("""[[{ "label": "ক", "popup": { "relevant": [
        { "type": "placeholder" }

@@ -26,7 +26,11 @@
     },
     { "$": "keyboard_state_selector", "languageKeyEnabled": { "$": "keyboard_state_selector", "alphabet": { "label": "language_switch" }}},
     { "$": "keyboard_state_selector", "symbols": { "label": "numpad" } },
+    { "$": "keyboard_state_selector", "moreSymbols": { "label": "<", "type": "function",
+        "popup": { "relevant": [{ "label": "!fixedColumnOrder!3" }, { "label": "‹" }, { "label": "≤" }, { "label": "«" }] } } },
     { "label": "space" },
+    { "$": "keyboard_state_selector", "moreSymbols": { "label": ">", "type": "function",
+        "popup": { "relevant": [{ "label": "!fixedColumnOrder!3" }, { "label": "›" }, { "label": "≥" }, { "label": "»" }] } } },
     { "$": "keyboard_state_selector",
       "symbols": { "$": "keyboard_state_selector", "dpadKeyEnabled": { "label": "dpad" } },
       "dpad": { "label": "symbol" }

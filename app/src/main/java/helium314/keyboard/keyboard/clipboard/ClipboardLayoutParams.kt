@@ -11,7 +11,12 @@ import helium314.keyboard.latin.R
 import helium314.keyboard.latin.settings.Settings
 import helium314.keyboard.latin.utils.ResourceUtils
 
-class ClipboardLayoutParams(ctx: Context) {
+/**
+ * @param withBottomRow whether the clipboard view shows the bottom key row (alpha / space / delete). Like OpenBoard, the
+ *  bottom row is only shown if there is no strip above the clipboard view (which then has the "ABC" key), and the
+ *  clipboard list uses the full height otherwise.
+ */
+class ClipboardLayoutParams(ctx: Context, val withBottomRow: Boolean = showsClipboardBottomRow()) {
 
     private val keyVerticalGap: Int
     private val keyHorizontalGap: Int
@@ -37,7 +42,14 @@ class ClipboardLayoutParams(ctx: Context) {
         bottomRowKeyboardHeight = (defaultKeyboardHeight - bottomPadding - topPadding) / rowCount - keyVerticalGap / 2
         // height calculation is not good enough, probably also because keyboard top padding might be off by a pixel (see KeyboardParser)
         val offset = 1.25f * res.displayMetrics.density * sv.mKeyboardHeightScale
-        listHeight = defaultKeyboardHeight - bottomRowKeyboardHeight - bottomPadding + offset.toInt()
+        listHeight = if (withBottomRow) defaultKeyboardHeight - bottomRowKeyboardHeight - bottomPadding + offset.toInt()
+            else defaultKeyboardHeight - bottomPadding
+    }
+
+    companion object {
+        /** bottom row is only needed if the strip (with the "ABC" key) is not shown */
+        @JvmStatic
+        fun showsClipboardBottomRow() = !Settings.getValues().isSecondaryStripVisible
     }
 
     fun setListProperties(recycler: RecyclerView) {
