@@ -125,13 +125,32 @@ class ClipboardHistoryView @JvmOverloads constructor(
         toolbarKeys.forEach { it.layoutParams = toolbarKeyLayoutParams }
     }
 
-    private fun setupBottomRowKeyboard(editorInfo: EditorInfo, listener: KeyboardActionListener) {
+    private fun setupBottomRowKeyboard(editorInfo: EditorInfo, listener: KeyboardActionListener, params: KeyDrawParams) {
         val keyboardView = findViewById<MainKeyboardView>(R.id.bottom_row_keyboard)
         keyboardView.setKeyboardActionListener(listener)
         PointerTracker.switchTo(keyboardView)
         val kls = KeyboardLayoutSet.Builder.buildEmojiClipBottomRow(context, editorInfo)
         val keyboard = kls.getKeyboard(KeyboardElement.CLIPBOARD_BOTTOM_ROW)
         keyboardView.setKeyboard(keyboard)
+
+        // OpenBoard-style: no bottom key row, instead an "ABC" key in the strip above the clipboard list
+        val showBottomRow = ClipboardLayoutParams.showsClipboardBottomRow()
+        keyboardView.visibility = if (showBottomRow) VISIBLE else GONE
+        val alphaKey = KeyboardSwitcher.getInstance().clipboardStripAlphaKey ?: return
+        alphaKey.visibility = if (showBottomRow) GONE else VISIBLE
+        if (showBottomRow) return
+        // use the label of the alpha key in the (hidden) bottom row, so it's localized like the normal alpha key
+        alphaKey.text = keyboard.sortedKeys.firstOrNull { it.code == KeyCode.ALPHA }?.label ?: "ABC"
+        alphaKey.contentDescription = alphaKey.text
+        alphaKey.typeface = params.mTypeface
+        alphaKey.setTextColor(params.mTextColor)
+        alphaKey.setTextSize(TypedValue.COMPLEX_UNIT_PX, params.mLabelSize.toFloat())
+        alphaKey.setOnClickListener {
+            keyboardActionListener.onPressKey(KeyCode.ALPHA, 0, 1, HapticEvent.KEY_PRESS)
+            keyboardActionListener.onCodeInput(KeyCode.ALPHA, Constants.NOT_A_COORDINATE, Constants.NOT_A_COORDINATE, false)
+            keyboardActionListener.onReleaseKey(KeyCode.ALPHA, false)
+        }
+        Settings.getValues().mColors.setBackground(alphaKey, ColorType.STRIP_BACKGROUND)
     }
 
     fun setHardwareAcceleratedDrawingEnabled(enabled: Boolean) {
@@ -157,7 +176,7 @@ class ClipboardHistoryView @JvmOverloads constructor(
         val settings = Settings.getInstance()
         KeyboardTypeface.customTypeface()?.let { params.mTypeface = it }
         setupClipKey(params)
-        setupBottomRowKeyboard(editorInfo, keyboardActionListener)
+        setupBottomRowKeyboard(editorInfo, keyboardActionListener, params)
 
         placeholderView.apply {
             KeyboardTypeface.applyToTextView(this)

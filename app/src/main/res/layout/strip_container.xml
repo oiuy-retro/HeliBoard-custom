@@ -24,11 +24,31 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         style="?attr/suggestionStripViewStyle" />
-    <HorizontalScrollView
-        android:id="@+id/clipboard_strip_scroll_view"
+    <!-- OpenBoard-style clipboard strip: fixed "ABC" key on the left to go back to the letters
+         (like OpenBoard's clipboard_keyboard_alphabet), configurable clipboard toolbar keys on the right -->
+    <LinearLayout
+        android:id="@+id/clipboard_strip_container"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        style="?attr/suggestionStripViewStyle"
+        style="?attr/suggestionStripViewStyle" >
+    <TextView
+        android:id="@+id/clipboard_strip_alpha_key"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:minWidth="@dimen/config_suggestions_strip_edge_key_width"
+        android:paddingHorizontal="12dp"
+        android:gravity="center"
+        android:visibility="gone"
+        android:hapticFeedbackEnabled="false"
+        android:soundEffectsEnabled="false"
+        style="?attr/suggestionWordStyle" />
+    <HorizontalScrollView
+        android:id="@+id/clipboard_strip_scroll_view"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
         android:scrollbarThumbHorizontal="@color/toolbar_scrollbar" >
         <LinearLayout
             android:id="@+id/clipboard_strip"
@@ -42,4 +62,5 @@
                 android:layout_weight="1" />
         </LinearLayout>
     </HorizontalScrollView>
+    </LinearLayout>
 </FrameLayout>

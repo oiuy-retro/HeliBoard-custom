@@ -1,141 +1,236 @@
-# HeliBoard
-HeliBoard is a privacy-conscious and customizable open-source keyboard, based on AOSP / OpenBoard.
-Does not use internet permission, and thus is 100% offline.
+# HeliBoard — Custom Build
 
-[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" alt="Get it on F-Droid" height="80">](https://f-droid.org/packages/helium314.keyboard/)
-[<img src="https://user-images.githubusercontent.com/663460/26973090-f8fdc986-4d14-11e7-995a-e7c5e79ed925.png" alt="Get APK from GitHub" height="80">](https://github.com/HeliBorg/HeliBoard/releases/latest)
-[<img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png" alt="Get it on IzzyOnDroid" height="80">](https://apt.izzysoft.de/fdroid/index/apk/helium314.keyboard)
+A personal build of the HeliBoard keyboard with an OpenBoard-style suggestion strip, OpenBoard's symbol layouts, a clipboard view without the bottom key row, and an inverted launcher icon. It installs next to official HeliBoard.
 
-## Table of Contents
+> **This is an unofficial custom build.** It is based on
+> [HeliBoard](https://github.com/HeliBorg/HeliBoard) by Helium314 and the HeliBoard contributors
+> (itself a fork of [OpenBoard](https://github.com/openboard-team/openboard) and the AOSP keyboard),
+> and is distributed under the same [GNU General Public License v3.0](LICENSE). It is not
+> affiliated with or supported by the upstream project. Please don't report problems with this
+> build to them.
+>
+> The original upstream README is kept in [docs/UPSTREAM_README.md](docs/UPSTREAM_README.md).
 
-- [Features](#features)
-- [Contributing](#contributing-)
-   * [Reporting Issues](#reporting-issues)
-   * [Translations](#translations)
-   * [To Community](#to-community)
-   * [Code Contribution](CONTRIBUTING.md)
-- [Links](#links)
-- [License](#license)
-- [Credits](#credits)
-  * [Funding](#funding)
+- Based on upstream `main` at commit `e97acdbe` (the `v4.3-beta1` tag, 2026-10-18).
+- App version: **4.3-beta1**, versionCode **4300** (both unchanged from upstream).
+- Package name **`helium314.keyboard.custom`**, app name **HeliBoard Custom**.
+- Published builds are **release** builds, signed with this build's own key (see Signing).
+- See [CHANGELOG.md](CHANGELOG.md) for the history of the custom releases.
 
-# Features
-<ul>
-  <li>Add dictionaries for suggestions and spell check</li>
-  <ul>
-    <li>build your own, or get them  <a href="https://codeberg.org/Helium314/aosp-dictionaries#dictionaries">here</a> (quality may vary)</li>
-    <li>additional dictionaries for emojis or scientific symbols can be used to provide suggestions (similar to "emoji search")</li>
-    <li>note that for Korean layouts, suggestions only work using <a href="https://github.com/openboard-team/openboard/commit/83fca9533c03b9fecc009fc632577226bbd6301f">this dictionary</a>, the tools in the dictionary repository are not able to create working dictionaries</li>
-  </ul>
-  <li>Customize keyboard themes (style, colors and background image)</li>
-  <li>Emoji search (inline and separate, requires <a href="https://codeberg.org/Helium314/aosp-dictionaries">emoji dictionary</a>)</li>
-  <ul>
-    <li>can follow the system's day/night setting on Android 10+ (and on some versions of Android 9)</li>
-    <li>can follow dynamic colors for Android 12+</li>
-  </ul>
-  <li>Customize keyboard <a href="https://github.com/HeliBorg/HeliBoard/blob/main/layouts.md">layouts</a> (only available when disabling <i>use system languages</i>)</li>
-  <li>Customize special layouts, like symbols, number,  or functional key layout</li>
-  <li>Multilingual typing</li>
-  <li>Glide typing (<i>only with closed source library</i> ☹️)</li>
-  <ul>
-    <li>library not included in the app, as there is no compatible open source library available</li>
-    <li>can be extracted from GApps packages ("<i>swypelibs</i>"), or downloaded <a href="https://github.com/erkserkserks/openboard/tree/46fdf2b550035ca69299ce312fa158e7ade36967/app/src/main/jniLibs">here</a> (click on the file and then "raw" or the tiny download button)</li>
-  </ul>
-  <li>Clipboard history</li>
-  <li>One-handed mode</li>
-  <li>Split keyboard</li>
-  <li>Number pad</li>
-  <li>Backup and restore your settings and learned word / history data</li>
-</ul>
+## What's different from upstream
 
-For [FAQ](https://github.com/HeliBorg/HeliBoard/wiki/FAQ), [hidden features](https://github.com/HeliBorg/HeliBoard/wiki/9.-Hidden-features) and more information about the app and features, please visit the [wiki](https://github.com/HeliBorg/HeliBoard/wiki)
+### 1. Top bar works like OpenBoard's suggestion strip
 
-# Contributing ❤
+OpenBoard's strip has a 36 dp slot on the left, three suggestions, then a voice key and a clipboard
+key (36 dp each). It has no expandable toolbar. This build copies that arrangement by changing
+defaults, so all of HeliBoard's toolbar settings still work.
 
-## Reporting Issues
+- **Toolbar mode** (Settings → Toolbar) now defaults to **"Suggestions only"**. There is no arrow
+  key and no expandable toolbar.
+- **Voice** and **clipboard** are pinned to the right of the suggestions by default.
+  Tapping clipboard opens the clipboard history. Long-pressing it pastes, as in OpenBoard.
+- The voice key only shows if a voice input keyboard is installed, and not in fields that block
+  voice input, such as password fields (same as upstream).
+- The left slot stays empty but keeps its space. It shows the incognito icon when incognito mode is on.
+- Settings are still reachable by long-pressing the comma key, as in OpenBoard.
+- Sizes follow OpenBoard: the edge keys are 54 dp wide in landscape (upstream: 48 dp), and the strip
+  is 44 dp tall on screens 768 dp and wider (upstream: 40 dp). Other sizes were already the same.
+- To get the expandable toolbar back, set Toolbar mode to "Toolbar keys and suggestions".
 
-Whether you encountered a bug, or want to see a new feature in HeliBoard, you can contribute to the project by opening a new issue [here](https://github.com/HeliBorg/HeliBoard/issues). Your help is always welcome!
+### 2. `?123` and `=\<` symbol layouts match OpenBoard
 
-Before opening a new issue, be sure to check the following:
- - **Does the issue already exist?** Make sure a similar issue has not been reported by browsing [existing issues](https://github.com/HeliBorg/HeliBoard/issues?q=). Please search open and closed issues. In case of feature requests you could also check the [FAQ](https://github.com/HeliBorg/HeliBoard/wiki/FAQ) and [hidden features](https://github.com/HeliBorg/HeliBoard/wiki/9.-Hidden-features).
- - **Is the issue still relevant?** Make sure your issue is not already fixed in the latest version of HeliBoard.
- - **Is it a single topic?** If you want to suggest multiple things, open multiple issues.
- - **Did you use the issue template?** It is important to make life of our kind contributors easier by avoiding issues that miss key information to their resolution.
- - **Is it written by a human?** Do not use LLMs or similar to generate issues. Having LLMs help with translation or similar is acceptable, but must be disclosed. See also [AI_USAGE.md](AI_USAGE.md)
-Note that issues that that ignore part of the issue template will likely get treated with very low priority, as often they are needlessly hard to read or understand (e.g. huge screenshots, not providing a proper description, or addressing multiple topics). Blatant violation of the guidelines may result in the issue getting closed.
+The `?123` page now has 4 rows instead of 5:
 
-If you're interested, you can read the following useful text about effective bug reporting (a bit longer read): https://www.chiark.greenend.org.uk/~sgtatham/bugs.html
+| Row | `?123` | `=\<` |
+|---|---|---|
+| 1 | `1 2 3 4 5 6 7 8 9 0` | ``~ ` \| • √ π ÷ × ¶ ∆`` |
+| 2 | `@ # $ % & - + ( )` | `£ ¢ € ¥ ^ ° = { }` (other currencies depend on the language) |
+| 3 | `=\<` `* " ' : ; ! ?` delete | `?123` `\ © ® ™ ℅ [ ]` delete |
+| 4 | `ABC` `,` `_` space `/` `.` enter | `ABC` `,` `<` space `>` `.` enter |
 
-## Translations
-Translations can be added using [Weblate](https://translate.codeberg.org/projects/heliboard/). You will need an account to update translations and add languages. Add the language you want to translate to in Languages -> Manage translated languages in the top menu bar.
-Updating translations in a PR will not be accepted, as it may cause conflicts with Weblate translations.
+- Long-press keys follow OpenBoard's defaults, for example `%` → `‰`, `-` → `_ – — ·`,
+  `(` → `< { [`, `!` → `¡`, `?` → `¿`, `<` → `‹ ≤ «`.
+- Upstream's **numpad key** is no longer in the symbols bottom row, because OpenBoard has none. The
+  numpad is still available as a toolbar key (Settings → Toolbar → "Select pinned toolbar keys").
+- The **D-pad key** (Settings → Preferences → "D-pad key") is now **off by default**. If you turn it
+  on, it appears next to `/` on the `?123` page.
+- **Letter long-press symbols changed.** HeliBoard takes the symbol you get by long-pressing a letter
+  from the symbols layout. The top letter row now offers ``~ ` | • √ π ÷ × ¶ ∆`` (upstream:
+  `% \ | = [ ] < > { }`), and the middle row offers `@ # $ % & - + ( )`.
+- If you turn off "Show number row in symbols view", the `~ ` | …` row replaces the numbers on the `?123` page.
+  This is what OpenBoard shows below its number row when the number row is enabled.
+- The Arabic symbols layout uses the same rows with its Arabic characters kept.
+- **Tablets: partly done.** Only the `<` and `>` keys were added to the tablet bottom row. The rest of
+  the tablet layout is upstream's, because OpenBoard uses separate tablet layouts that weren't ported.
 
-Some notes on translations
-* when translating metadata, translating the changelogs is rather useless. It's available as it was requested by translators.
-* the `hidden_features_message` is horrible to translate with Weblate, and serves little benefit as it's just a copy of what's already in the wiki: https://github.com/HeliBorg/HeliBoard/wiki/9.-Hidden-features. It's been made available in the app on user request/contribution.
+### 3. Clipboard view has no bottom key row
 
-## To Community
-There is the [discussions on GitHub](https://github.com/HeliBorg/HeliBoard/discussions), or if you prefer a more open network there is [Lemmy](https://lemmy.world/c/Heliboard).
-You can share your themes, layouts and dictionaries with other people:
-* Themes can be saved and loaded using the menu on top-right in the _adjust colors_ screen
-  * you can share custom colors in a separate [discussion section](https://github.com/HeliBorg/HeliBoard/discussions/categories/custom-colors)
-  * there are theme collections available at [Star-Trowa/heliboard-themes](https://github.com/Star-Trowa/heliboard-themes) and [PickleHik3/droid-tings](https://github.com/PickleHik3/droid-tings)
-* Custom keyboard layouts are text files whose content you can edit, copy and share
-  * this applies to main keyboard layouts and to special layouts adjustable in advanced settings
-  * see [layouts.md](layouts.md) for details
-  * you can share custom layouts in a separate [discussion section](https://github.com/HeliBorg/HeliBoard/discussions/categories/custom-layout)
-  * [Roccobot's Layout Maker](https://roccobot.github.io/HeliBoard-RLM/) is a browser-based editor for json layout files
-* Creating dictionaries is a little more work
-  * first you will need a wordlist in the format from [here](https://codeberg.org/Helium314/aosp-dictionaries/src/branch/main/wordlists/sample.combined) and in the repository readme
-    * you can load the wordlist dictionary directly in HeliBoard like you would load a dictionary, but other AOSP keyboard forks will likely need the .dict file
-  * then you need to compile the dictionary using [external tools](https://github.com/remi0s/aosp-dictionary-tools)
-    * when you want to add the dictionary to the [repository](https://codeberg.org/Helium314/aosp-dictionaries/), no need to compile to a .dict file
-  * the resulting file (and ideally the wordlist too) can be shared with other users
-  * note that there will not be any further dictionaries added to this app, but you can add dictionaries to the [dictionaries repository](https://codeberg.org/Helium314/aosp-dictionaries)
+- The clipboard history no longer has the bottom row (ABC, space bar, delete). The list of clips
+  uses the freed space.
+- To go back to the letters, tap the **ABC** key on the left of the strip above the clips. The label
+  is the same as on the normal ABC key, so it changes with the language (for example `АБВ`).
+- The **clear history** key is now at the right edge of that strip, as in OpenBoard. The other
+  clipboard toolbar keys (arrows, undo, cut, copy, paste, select word) are still there to its left.
+- The "close" (X) key is no longer shown by default, because the ABC key replaces it. You can turn it
+  back on in Settings → Toolbar → "Select clipboard toolbar keys".
+- **Edge case:** if Toolbar mode is "Hidden" and "Hide clipboard and emoji toolbars too" is on
+  (the default for that option), there is no strip to put the ABC key in. The bottom row then stays,
+  so you can still get back to the letters.
+- The emoji view is unchanged and keeps its bottom row.
 
-## Code Contribution
-See [Contribution Guidelines](CONTRIBUTING.md)
+### 4. Inverted launcher icon
 
-# Links
-* Info
-  * [Wiki](https://github.com/HeliBorg/HeliBoard/wiki), including FAQ, help on customizing layouts, and gesture data gathering
-  * [Layout documentation](layouts.md) (more technical info regarding layout customization)
-  * [For creating custom dictionaries](https://codeberg.org/Helium314/aosp-dictionaries#wordlist-information) (see also top of the linked readme)
-* Community
-  * [Lemmy](https://lemmy.world/c/Heliboard)
-  * [Reddit](https://www.reddit.com/r/HeliBoard)
-  * GitHub [discussions](https://github.com/HeliBorg/HeliBoard/discussions)
-* Other
-  * [Translations](https://translate.codeberg.org/projects/heliboard/)
-  * [Dictionaries](https://codeberg.org/Helium314/aosp-dictionaries)
-  * [k3lp](https://codeberg.org/k3lp/k3lp) is a WIP library for keyboard layout parsing that will be implemented in HeliBoard when ready (created by [FlorisBoard](https://github.com/florisboard/florisboard/) maintainers)
-  * [swipe-o-scope](https://codeberg.org/eclexic/swipe-o-scope) for visualizing gesture data as created when using gesture data gathering
+- The launcher icon colors are inverted (red–purple gradient with white symbols → green gradient
+  with black symbols). This makes the custom build easy to tell apart from official HeliBoard.
+- Inverted: the adaptive icon's foreground and background, all `mipmap-*` PNGs, and the store icon in
+  `fastlane/`. The themed (monochrome) icon on Android 13+ keeps its shape, because Android colors it.
+- The legacy PNG icons had a faint dark drop shadow. It's inverted too, so it's now a faint light edge.
 
-# License
+### 5. Own package name, app name and signing key
 
-HeliBoard (as a fork of OpenBoard) is licensed under GNU General Public License v3.0.
+- Package name `helium314.keyboard.custom` (upstream: `helium314.keyboard`), so it installs next to
+  official HeliBoard instead of replacing it.
+- App and keyboard name **HeliBoard Custom**. The spell checker is "HeliBoard Custom Spell Checker"
+  in English. Other languages keep upstream's translated names.
+- The internal file providers (for pasting clipboard images and sharing gesture data) got their own
+  names (`helium314.keyboard.custom.clipprovider` and `helium314.keyboard.custom.provider`), so they
+  don't clash with official HeliBoard's.
+- Release builds are signed with this build's own release key. Its SHA-256 certificate fingerprint is:
+  `8C:4D:B0:D6:55:51:73:3C:F9:09:C5:22:CE:3B:37:E3:1A:E1:11:76:31:58:07:0F:AA:32:51:78:60:27:9E:EF`
+- The Java/Kotlin code still uses the `helium314.keyboard` package names, so upstream changes merge
+  as before.
 
- > Permissions of this strong copyleft license are conditioned on making available complete source code of licensed works and modifications, which include larger works using a licensed work, under the same license. Copyright and license notices must be preserved. Contributors provide an express grant of patent rights.
+### 6. Longer gesture trail
 
-See repo's [LICENSE](/LICENSE) file.
+- The **Gesture trail lifespan** slider (Settings → Gesture typing) now goes up to **20,000 ms (20 s)**
+  instead of 2,000 ms. The minimum (200 ms) and the default (900 ms) are unchanged.
+- The slider isn't linear: the old range up to 2 s takes about the first 30 % of it, in 10 ms steps.
+  Above 2 s it moves in 50 ms steps.
+- The word preview that floats above the trail still disappears after at most 475 ms, as before.
+  Upstream ties it to a quarter of the trail lifespan, so without this limit it could stay for 5 s.
+- While a trail is visible the keyboard redraws it about 50 times a second (same as upstream). A very
+  long lifespan therefore keeps that redraw going longer and uses a bit more battery.
 
-Since the app is based on Apache 2.0 licensed AOSP Keyboard, an [Apache 2.0](LICENSE-Apache-2.0) license file is provided.
-The icon is licensed under [Creative Commons BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). A [license file](LICENSE-CC-BY-SA-4.0) is also included.
+### Existing settings
 
-# Credits
-- Icon by [Fabian OvrWrt](https://github.com/FabianOvrWrt) with contributions from [The Eclectic Dyslexic](https://github.com/the-eclectic-dyslexic)
-- [OpenBoard](https://github.com/openboard-team/openboard)
-- [AOSP Keyboard](https://android.googlesource.com/platform/packages/inputmethods/LatinIME/)
-- [LineageOS](https://review.lineageos.org/admin/repos/LineageOS/android_packages_inputmethods_LatinIME)
-- [Simple Keyboard](https://github.com/rkkr/simple-keyboard)
-- [Indic Keyboard](https://gitlab.com/indicproject/indic-keyboard)
-- [FlorisBoard](https://github.com/florisboard/florisboard/)
-- Our [contributors](https://github.com/HeliBorg/HeliBoard/graphs/contributors)
+The toolbar, pinned keys, clipboard toolbar keys and D-pad changes above are new **defaults**. If you
+restore a backup from official HeliBoard (see Install), any of these settings you had changed there
+come back as you set them. Settings you never changed get this build's defaults. The symbol layouts
+and the clipboard bottom row change apply in any case.
 
-## Funding
+## Install
 
-This project is funded through [NGI Mobifree Fund](https://nlnet.nl/mobifree), a fund established by [NLnet](https://nlnet.nl) with financial support from the European Commission's [Next Generation Internet](https://ngi.eu) program. Learn more at the [NLnet project page](https://nlnet.nl/project/GestureTyping).
+Requirements: **Android 5.0 (API 21) or newer.**
 
-[<img src="https://nlnet.nl/logo/banner.png" alt="NLnet foundation logo" width="20%" />](https://nlnet.nl)
+1. Download the latest `.apk` from this repository's
+   [Releases](https://github.com/oiuy-retro/HeliBoard-custom/releases) page. APK files are never
+   committed to the repository. Each release also has a `SHA256SUMS` file to check the download
+   (`sha256sum -c SHA256SUMS`).
+2. The package name is `helium314.keyboard.custom`, so it installs **alongside** official HeliBoard
+   (`helium314.keyboard`). Nothing has to be uninstalled.
+3. **If you installed an earlier test build** (`openboard-layout-debug-1`, shown as "HeliBoard debug",
+   package `helium314.keyboard.debug`), uninstall it. It's a different app and won't be updated.
+   Back up its settings first if you want to keep them (step 6).
+4. Open the APK on your phone. If asked, allow your browser or file manager to
+   **install unknown apps** (Settings → Apps → Special app access → Install unknown apps).
+5. Enable **HeliBoard Custom** in Android's keyboard settings and pick it as the current keyboard.
+6. To copy your settings from official HeliBoard or the test build, use Settings → Advanced →
+   **Backup and restore** there, then restore the file in HeliBoard Custom. Toolbar settings you had
+   changed there come back (see "Existing settings" above).
+7. Later releases install as normal updates over earlier ones, because they're signed with the same
+   release key.
 
-Further the project benefits from donations provided by many users (thank you all!).
+## Building from source
+
+Short version. Details and troubleshooting are in [docs/BUILDING.md](docs/BUILDING.md).
+
+- **JDK 17** to build. Running the unit tests needs **JDK 21** (Robolectric).
+- **Android SDK** with platform **android-37** and **NDK 28.0.13004108** (the keyboard has native
+  code). Gradle downloads missing SDK parts itself if the licenses are accepted.
+- The Gradle wrapper (Gradle 9.7.1) is checked in, so you don't need your own Gradle install.
+
+```bash
+git clone https://github.com/oiuy-retro/HeliBoard-custom.git
+cd HeliBoard-custom
+echo "sdk.dir=$HOME/Android/Sdk" > local.properties   # path to your Android SDK
+cp keystore.properties.example keystore.properties   # then edit it, see Signing
+./gradlew assembleRelease
+# -> app/build/outputs/apk/release/HeliBoard_4.3-beta1-release.apk
+```
+
+### Signing
+
+`app/build.gradle.kts` reads the release signing details from a file called **`keystore.properties`**
+in the repository root. That file is listed in `.gitignore` and must **never** be committed.
+[`keystore.properties.example`](keystore.properties.example) is the template:
+
+```properties
+storeFile=/absolute/path/to/heliboard-custom-release.jks
+storePassword=your-store-password
+keyAlias=heliboard-custom
+keyPassword=your-key-password
+```
+
+If `keystore.properties` is missing, release builds are signed with the Android **debug** key instead.
+They still install, but they can't update an APK signed with the release key. To update an existing
+install, always sign with the **same keystore** as before, and keep a backup of it. Keystores
+(`*.jks`, `*.keystore`) are also in `.gitignore`.
+
+Debug builds (`./gradlew assembleDebug`) are always signed with the debug key and use the package
+`helium314.keyboard.custom.debug`, so they install as a separate app.
+
+## Known limitations
+
+- Testing: each release is built with `./gradlew assembleRelease` and checked with the unit tests.
+  One unit test checks the new symbol layouts. The top bar and symbol changes were tried by hand on one
+  phone (in the earlier debug test build). The clipboard change, the icon and the new package name
+  were built and unit-tested but not yet tried on a device. There is no automated on-device testing.
+- Unit tests: 194 run, 8 fail. The same 8 fail on unmodified upstream at `e97acdbe`: 5 tests marked
+  as known failures (names ending in `Fails`) and 3 link checks (`XLinkTest`) that need internet access.
+- Only the **release** variant is published. Upstream's other build types (`nouserlib`, `runTests`,
+  `debugNoMinify`) still build but haven't been tried. `nouserlib` isn't signed.
+- Tablet symbol layouts only partly follow OpenBoard (see section 2).
+- The numpad key is gone from the symbols bottom row. Pin the numpad toolbar key if you use it.
+- Letter long-press symbols differ from upstream (see section 2).
+- Backups restored from official HeliBoard bring back toolbar settings you had changed (see "Existing settings").
+- The earlier test build (`helium314.keyboard.debug`) can't be updated to this one. Uninstall it (see Install).
+- Settings and learned words don't move over automatically from official HeliBoard. Use Backup and restore.
+
+## Staying in sync with upstream
+
+This fork keeps upstream's history, so new upstream versions can be merged in. Upstream's default
+branch is `main`, and releases are tagged like `v4.3-beta1`. The short version:
+
+```bash
+git remote add upstream https://github.com/HeliBorg/HeliBoard.git   # once
+git fetch upstream --tags
+git checkout openboard-layout
+git merge upstream/main          # or a release tag, e.g. v4.3
+# resolve conflicts, build, run the tests, push, publish a release
+```
+
+The full walkthrough is in [docs/UPDATING_FROM_UPSTREAM.md](docs/UPDATING_FROM_UPSTREAM.md). It
+lists the files that tend to conflict and how to publish a release.
+
+## More documentation
+
+- [CHANGELOG.md](CHANGELOG.md): what changed in each custom release
+- [docs/BUILDING.md](docs/BUILDING.md): build, signing and troubleshooting
+- [docs/CUSTOM_CHANGES.md](docs/CUSTOM_CHANGES.md): technical details of the custom changes
+- [docs/UPDATING_FROM_UPSTREAM.md](docs/UPDATING_FROM_UPSTREAM.md): merging new upstream versions
+- [docs/UPSTREAM_README.md](docs/UPSTREAM_README.md): the original upstream README
+
+## License and credits
+
+HeliBoard is © Helium314 and the HeliBoard contributors, licensed under the
+[GNU GPL v3.0](LICENSE). It is based on OpenBoard and the AOSP keyboard
+([Apache 2.0](LICENSE-Apache-2.0)). This custom build is a modified version and is under the same
+licenses. Source files keep their original copyright headers.
+
+The launcher icon is by [Fabian OvrWrt](https://github.com/FabianOvrWrt) with contributions from
+[The Eclectic Dyslexic](https://github.com/the-eclectic-dyslexic), licensed under
+[CC BY-SA 4.0](LICENSE-CC-BY-SA-4.0). This build inverts its colors. The modified icon is under the same license.
+
+The layouts and strip arrangement copied in this build come from
+[OpenBoard](https://github.com/openboard-team/openboard) (GPL-3.0). All credit for the app itself
+goes to the upstream authors: <https://github.com/HeliBorg/HeliBoard>.

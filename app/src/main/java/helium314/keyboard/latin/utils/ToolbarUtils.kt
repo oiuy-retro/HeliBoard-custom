@@ -147,7 +147,8 @@ val defaultPinnedToolbarPref by lazy {
 }
 
 val defaultClipboardToolbarPref by lazy {
-    val default = listOf(CLEAR_CLIPBOARD, UP, DOWN, LEFT, RIGHT, UNDO, CUT, COPY, PASTE, SELECT_WORD, CLOSE_HISTORY)
+    // OpenBoard-style: clear key at the right edge, and no close key (the clipboard strip has an "ABC" key on the left)
+    val default = listOf(UP, DOWN, LEFT, RIGHT, UNDO, CUT, COPY, PASTE, SELECT_WORD, CLEAR_CLIPBOARD)
     val others = entries.filterNot { it in default }
     default.joinToString(Separators.ENTRY) { it.name + Separators.KV + true } + Separators.ENTRY +
             others.joinToString(Separators.ENTRY) { it.name + Separators.KV + false }

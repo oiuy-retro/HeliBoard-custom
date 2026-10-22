@@ -1,4 +1,14 @@
 import com.android.build.api.variant.ApplicationVariant
+import java.util.Properties
+
+// Release signing: read from keystore.properties in the repository root (gitignored, see keystore.properties.example).
+// If the file is missing, release builds are signed with the debug key instead.
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystoreProperties = Properties().apply {
+    if (keystorePropertiesFile.exists()) keystorePropertiesFile.inputStream().use { load(it) }
+}
+val hasReleaseKeystore = listOf("storeFile", "storePassword", "keyAlias", "keyPassword")
+    .all { !keystoreProperties.getProperty(it).isNullOrBlank() }
 
 plugins {
     id("com.android.application")
@@ -10,7 +20,7 @@ android {
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "helium314.keyboard"
+        applicationId = "helium314.keyboard.custom" // custom build, installs alongside official HeliBoard (helium314.keyboard)
         minSdk = 21
         targetSdk = 37
         versionCode = 4300
@@ -22,8 +32,21 @@ android {
         proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
     }
 
+    signingConfigs {
+        if (hasReleaseKeystore) {
+            create("release") {
+                storeFile = file(keystoreProperties.getProperty("storeFile"))
+                storePassword = keystoreProperties.getProperty("storePassword")
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig = if (hasReleaseKeystore) signingConfigs.getByName("release")
+                else signingConfigs.getByName("debug")
             isMinifyEnabled = true
             isShrinkResources = false
             isDebuggable = false

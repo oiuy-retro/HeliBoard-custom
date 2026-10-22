@@ -5,6 +5,14 @@ import android.content.Context
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import helium314.keyboard.settings.dialogs.SliderDialog
+import helium314.keyboard.settings.preferences.Preference
+import kotlin.math.roundToInt
+import kotlin.math.sqrt
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -101,16 +109,60 @@ fun createGestureTypingSettings(context: Context) = listOf(
         )
     },
     Setting(context, Settings.PREF_GESTURE_TRAIL_FADEOUT_DURATION, R.string.gesture_trail_fadeout_duration) { def ->
-        SliderPreference(
-            name = def.title,
-            key = def.key,
-            default = Defaults.PREF_GESTURE_TRAIL_FADEOUT_DURATION,
-            range = 100f..1900f,
-            description = { stringResource(R.string.abbreviation_unit_milliseconds, (it + 100).toString()) },
-            stepSize = 10,
-        ) { KeyboardSwitcher.getInstance().setThemeNeedsReload() }
+        GestureTrailLifespanPreference(def.title, def.key)
     },
 )
+
+// Stored value is the fade-out duration (the shown lifespan adds the 100 ms fade-out start delay).
+// Range 100..19900 ms, i.e. a lifespan of 200 ms .. 20 s. The slider is quadratic so the low end stays
+// usable: the old range (up to 2 s) takes about the first 30 % of the slider.
+private const val TRAIL_FADEOUT_MIN = 100
+private const val TRAIL_FADEOUT_MAX = 19900
+
+private fun trailFadeoutFromPosition(position: Float): Int {
+    val p = position.coerceIn(0f, 1f)
+    val raw = TRAIL_FADEOUT_MIN + (TRAIL_FADEOUT_MAX - TRAIL_FADEOUT_MIN) * p * p
+    val step = if (raw < 1900f) 10 else 50 // 10 ms steps in the old range, 50 ms above
+    return ((raw / step).roundToInt() * step).coerceIn(TRAIL_FADEOUT_MIN, TRAIL_FADEOUT_MAX)
+}
+
+private fun positionFromTrailFadeout(fadeout: Int): Float =
+    sqrt((fadeout.coerceIn(TRAIL_FADEOUT_MIN, TRAIL_FADEOUT_MAX) - TRAIL_FADEOUT_MIN).toFloat()
+            / (TRAIL_FADEOUT_MAX - TRAIL_FADEOUT_MIN))
+
+@Composable
+private fun GestureTrailLifespanPreference(name: String, key: String) {
+    val ctx = LocalContext.current
+    val prefs = ctx.prefs()
+    val b = (ctx.getActivity() as? SettingsActivity)?.prefChanged?.collectAsState()
+    if ((b?.value ?: 0) < 0)
+        Log.v("irrelevant", "stupid way to trigger recomposition on preference change")
+    val current = prefs.getInt(key, Defaults.PREF_GESTURE_TRAIL_FADEOUT_DURATION)
+    var showDialog by rememberSaveable { mutableStateOf(false) }
+    Preference(
+        name = name,
+        onClick = { showDialog = true },
+        description = stringResource(R.string.abbreviation_unit_milliseconds, (current + 100).toString())
+    )
+    if (showDialog)
+        SliderDialog(
+            onDismissRequest = { showDialog = false },
+            onDone = {
+                prefs.edit { putInt(key, trailFadeoutFromPosition(it)) }
+                KeyboardSwitcher.getInstance().setThemeNeedsReload()
+            },
+            initialValue = positionFromTrailFadeout(current),
+            range = 0f..1f,
+            positionString = {
+                stringResource(R.string.abbreviation_unit_milliseconds, (trailFadeoutFromPosition(it) + 100).toString())
+            },
+            showDefault = true,
+            onDefault = {
+                prefs.edit { remove(key) }
+                KeyboardSwitcher.getInstance().setThemeNeedsReload()
+            },
+        )
+}
 
 @Preview
 @Composable
