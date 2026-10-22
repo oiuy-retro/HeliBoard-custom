@@ -73,7 +73,7 @@ To keep the fork's `main` equal to upstream before merging, you can also run
 | `app/src/test/java/helium314/keyboard/Shadows.kt` | Test package names. |
 | `app/src/main/java/helium314/keyboard/settings/screens/GestureTypingScreen.kt`, `MainKeyboardView.java` | Gesture trail lifespan slider and floating preview linger cap. |
 | Launcher icon files (see [CUSTOM_CHANGES.md](CUSTOM_CHANGES.md#4-launcher-icon)) | If upstream changes its icon, keep upstream's new icon and invert it again. |
-| `README.md` | Upstream's README lives in `docs/UPSTREAM_README.md`. Copy upstream's new README there, and fix its relative links (prefix them with `../`). |
+| `README.md` | This repository's README is the custom build's own. Upstream's README isn't copied. If upstream changes its README, keep ours, and update [ABOUT_HELIBOARD.md](ABOUT_HELIBOARD.md) if HeliBoard's features or links changed. |
 
 ## Inverting the icon again
 

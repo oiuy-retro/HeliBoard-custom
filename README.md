@@ -1,15 +1,16 @@
 # HeliBoard — Custom Build
 
-A personal build of the HeliBoard keyboard with an OpenBoard-style suggestion strip, OpenBoard's symbol layouts, a clipboard view without the bottom key row, and an inverted launcher icon. It installs next to official HeliBoard.
+A personal build of the HeliBoard keyboard with an OpenBoard-style suggestion strip, OpenBoard's symbol layouts, a clipboard view without the bottom key row, a longer gesture trail and an inverted launcher icon. It installs next to official HeliBoard.
 
 > **This is an unofficial custom build.** It is based on
 > [HeliBoard](https://github.com/HeliBorg/HeliBoard) by Helium314 and the HeliBoard contributors
-> (itself a fork of [OpenBoard](https://github.com/openboard-team/openboard) and the AOSP keyboard),
+> (itself based on [OpenBoard](https://github.com/openboard-team/openboard) and the AOSP keyboard),
 > and is distributed under the same [GNU General Public License v3.0](LICENSE). It is not
-> affiliated with or supported by the upstream project. Please don't report problems with this
+> affiliated with or supported by the upstream project — please don't report problems with this
 > build to them.
 >
-> The original upstream README is kept in [docs/UPSTREAM_README.md](docs/UPSTREAM_README.md).
+> An overview of HeliBoard itself is in [docs/ABOUT_HELIBOARD.md](docs/ABOUT_HELIBOARD.md). Upstream's
+> original README is at <https://github.com/HeliBorg/HeliBoard/blob/main/README.md>.
 
 - Based on upstream `main` at commit `e97acdbe` (the `v4.3-beta1` tag, 2026-10-18).
 - App version: **4.3-beta1**, versionCode **4300** (both unchanged from upstream).
@@ -142,7 +143,7 @@ Requirements: **Android 5.0 (API 21) or newer.**
 
 ## Building from source
 
-Short version. Details and troubleshooting are in [docs/BUILDING.md](docs/BUILDING.md).
+Short version (details and troubleshooting are in [docs/BUILDING.md](docs/BUILDING.md)):
 
 - **JDK 17** to build. Running the unit tests needs **JDK 21** (Robolectric).
 - **Android SDK** with platform **android-37** and **NDK 28.0.13004108** (the keyboard has native
@@ -218,7 +219,8 @@ lists the files that tend to conflict and how to publish a release.
 - [docs/BUILDING.md](docs/BUILDING.md): build, signing and troubleshooting
 - [docs/CUSTOM_CHANGES.md](docs/CUSTOM_CHANGES.md): technical details of the custom changes
 - [docs/UPDATING_FROM_UPSTREAM.md](docs/UPDATING_FROM_UPSTREAM.md): merging new upstream versions
-- [docs/UPSTREAM_README.md](docs/UPSTREAM_README.md): the original upstream README
+- [docs/ABOUT_HELIBOARD.md](docs/ABOUT_HELIBOARD.md): what HeliBoard is, its features, and links to
+  upstream's own documentation
 
 ## License and credits
 

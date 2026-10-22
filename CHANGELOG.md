@@ -9,6 +9,19 @@ prereleases and told apart by their tag. From `custom-v1` on, they're release bu
 `helium314.keyboard.custom`. The earlier test build was a debug build (`helium314.keyboard.debug`).
 For changes in the app itself, see the [upstream project](https://github.com/HeliBorg/HeliBoard).
 
+## [Unreleased]
+
+Documentation only. No new APK.
+
+### Changed
+- `docs/UPSTREAM_README.md` (a copy of upstream's README) is replaced by
+  [docs/ABOUT_HELIBOARD.md](docs/ABOUT_HELIBOARD.md), a short description of HeliBoard in this
+  repository's style: what it is, its features (with notes where this build differs), links to
+  upstream's README, wiki, FAQ and contributing guide, and the licenses. Links in the README and
+  docs are updated.
+- README: blockquote and "Building from source" wording aligned with the other custom repositories,
+  and the intro now mentions the longer gesture trail.
+
 ## [custom-v1] - 2026-10-22
 
 ### Changed
@@ -37,8 +50,8 @@ For changes in the app itself, see the [upstream project](https://github.com/Hel
 - `keystore.properties.example` and `.gitignore` entries for signing files (`keystore.properties`,
   `*.jks`, `*.keystore`).
 - Documentation for the custom build: README, this changelog, `docs/BUILDING.md`,
-  `docs/CUSTOM_CHANGES.md` and `docs/UPDATING_FROM_UPSTREAM.md`. The upstream README is now in
-  `docs/UPSTREAM_README.md`.
+  `docs/CUSTOM_CHANGES.md` and `docs/UPDATING_FROM_UPSTREAM.md`. The upstream README was moved to
+  `docs/UPSTREAM_README.md` (replaced later, see Unreleased).
 - `SHA256SUMS` file attached to the release.
 
 ## [openboard-layout-debug-1] - 2026-10-22
