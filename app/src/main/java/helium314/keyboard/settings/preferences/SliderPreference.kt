@@ -15,6 +15,7 @@ import helium314.keyboard.latin.utils.prefs
 import helium314.keyboard.settings.SettingsActivity
 import helium314.keyboard.settings.dialogs.SliderDialog
 import androidx.core.content.edit
+import kotlin.math.roundToInt
 
 @Suppress("UNCHECKED_CAST") // it's sort of checked
 @Composable
@@ -51,8 +52,9 @@ fun <T: Number> SliderPreference(
             onDismissRequest = { showDialog = false },
             onDone = {
                 if (default is Int) {
-                    prefs.edit { putInt(key, it.toInt()) }
-                    onConfirmed(it.toInt() as T)
+                    val intVal = it.roundToInt()
+                    prefs.edit { putInt(key, intVal) }
+                    onConfirmed(intVal as T)
                 } else {
                     prefs.edit { putFloat(key, it) }
                     onConfirmed(it as T)
@@ -60,9 +62,13 @@ fun <T: Number> SliderPreference(
             },
             initialValue = initialValue.toFloat(),
             range = range,
+            defaultValue = default.toFloat(),
+            isDefaultValue = { pos ->
+                default.toFloat() in range && if (default is Int) pos.roundToInt() == default else pos == default.toFloat()
+            },
             positionString = {
                 @Suppress("UNCHECKED_CAST")
-                description((if (default is Int) it.toInt() else it) as T)
+                description((if (default is Int) it.roundToInt() else it) as T)
             },
             onValueChanged = onValueChanged,
             showDefault = true,

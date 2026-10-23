@@ -13,7 +13,7 @@ A personal build of the HeliBoard keyboard with an OpenBoard-style suggestion st
 > original README is at <https://github.com/HeliBorg/HeliBoard/blob/main/README.md>.
 
 - Based on upstream `main` at commit `e97acdbe` (the `v4.3-beta1` tag, 2026-10-18).
-- App version: **4.3-beta1**, versionCode **4301** (upstream is 4300).
+- App version: **4.3-beta1**, versionCode **4302** (upstream is 4300).
 - Package name **`helium314.keyboard.custom`**, app name **HeliBoard Custom**.
 - Published builds are **release** builds, signed with this build's own key (see Signing).
 - See [CHANGELOG.md](CHANGELOG.md) for the history of the custom releases.
@@ -104,11 +104,14 @@ The `?123` page now has 4 rows instead of 5:
 ### 6. Longer gesture trail that changes color on every swipe
 
 - **New light color on every swipe.** Each gesture stroke picks a new light pastel color in the same
-  saturation and brightness family as OpenBoard's default light teal (`#80CBC4`, HSV saturation 36.9 %,
-  value 79.6 %). Starting from `#80CBC4` (hue 174.4°), each swipe steps the hue around the color wheel
-  by the golden angle (~137.5°): light teal (`#80CBC4`), rose (`#CB80BC`), sage green (`#A6CB80`),
-  periwinkle (`#8090CB`), coral (`#CB8680`), mint (`#80CB9B`), lavender (`#B180CB`), soft yellow
-  (`#CBC780`), sky blue (`#80B9CB`), pink (`#CB80A3`) and so on.
+  brightness family as OpenBoard's default light teal (`#80CBC4`, HSV hue `174.4°`, saturation `37 %`,
+  value `79.6 %`). Starting from `#80CBC4`, each swipe steps the hue around the color wheel by the
+  configured angle step (default `138°`, matching the golden angle ~`137.5°`): light teal (`#80CBC4`),
+  rose (`#CB80BB`), sage green (`#A5CB80`), periwinkle (`#808ECB`), coral (`#CB8880`), mint (`#80CB9E`),
+  lavender (`#B580CB`), soft yellow (`#CBC480`), sky blue (`#80B6CB`), pink (`#CB80A0`) and so on.
+- **Saturation and angle step sliders** (Settings → Gesture typing, shown when the gesture trail is on):
+  - **Gesture trail color saturation**: `0 %` – `100 %` (`1 %` steps, default **`37 %`** matching OpenBoard's `#80CBC4`).
+  - **Gesture trail color angle step**: `0°` – `180°` (`1°` steps, default **`138°`** matching the golden angle; `0°` keeps the default teal hue on every swipe).
 - **Lingering trails keep their own color.** Each trail point stores the color of the swipe that drew
   it. When several trails remain on screen at once (with a long lifespan), older strokes keep the color
   they were swiped with while they fade out instead of switching to the new swipe's color.
@@ -120,6 +123,14 @@ The `?123` page now has 4 rows instead of 5:
   Upstream ties it to a quarter of the trail lifespan, so without this limit it could stay for 5 s.
 - While a trail is visible the keyboard redraws it about 50 times a second (same as upstream). A very
   long lifespan therefore keeps that redraw going longer and uses a bit more battery.
+
+### 7. Settings sliders snap and vibrate at their default value
+
+- Every settings slider (`SliderPreference`, the non-linear gesture trail lifespan slider, and the
+  multi-slider `KeyboardScalePreference` dialogs) **snaps to its default value** when dragged within
+  `±2 %` of the slider's span around the default.
+- When the slider lands on the default value while being dragged, the phone gives a **short haptic tick**
+  (once on entering the default, so it doesn't buzz repeatedly while held there).
 
 ### Existing settings
 
@@ -195,7 +206,7 @@ Debug builds (`./gradlew assembleDebug`) are always signed with the debug key an
   Unit tests check the new symbol layouts and the per-swipe gesture trail colors. The top bar, symbol
   layouts, clipboard view, icon and package name were tried on a phone. There is no automated on-device
   testing.
-- Unit tests: 196 run, 8 fail. The same 8 fail on unmodified upstream at `e97acdbe`: 5 tests marked
+- Unit tests: 198 run, 8 fail. The same 8 fail on unmodified upstream at `e97acdbe`: 5 tests marked
   as known failures (names ending in `Fails`) and 3 link checks (`XLinkTest`) that need internet access.
 - Only the **release** variant is published. Upstream's other build types (`nouserlib`, `runTests`,
   `debugNoMinify`) still build but haven't been tried. `nouserlib` isn't signed.

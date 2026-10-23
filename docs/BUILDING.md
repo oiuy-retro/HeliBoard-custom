@@ -55,7 +55,7 @@ export JAVA_HOME=/path/to/jdk-21
 ./gradlew :app:testDebugUnitTest
 ```
 
-Expected result: 196 tests, **8 failures**. The same 8 fail on unmodified upstream:
+Expected result: 198 tests, **8 failures**. The same 8 fail on unmodified upstream:
 
 - 5 tests that document known bugs: `CharacterIteratorTest.lastGraphemeFails`,
   `CharacterIteratorTest.firstGraphemeFails`, `InputLogicTest.insertLetterIntoWordHangulFails`,

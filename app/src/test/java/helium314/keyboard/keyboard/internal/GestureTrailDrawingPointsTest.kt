@@ -6,6 +6,7 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.Rect
 import android.os.SystemClock
+import helium314.keyboard.settings.dialogs.snapSliderValueToDefault
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import java.time.Duration
@@ -29,7 +30,7 @@ class GestureTrailDrawingPointsTest {
         assertEquals(12, colors.toSet().size, "Each consecutive swipe should get a distinct color")
         assertEquals(0xFF80CBC4.toInt(), colors.first())
 
-        // Every generated color must have the same light HSV saturation and value as #80CBC4
+        // Every generated color must have the same light HSV saturation (37%) and value (79.6%) as #80CBC4
         // (RGB channels bounded between 0x80 and 0xCB).
         for (color in colors) {
             val r = (color ushr 16) and 0xFF
@@ -39,6 +40,39 @@ class GestureTrailDrawingPointsTest {
             assertEquals(0x80, minOf(r, g, b), "Minimum RGB channel should match light teal floor (0x80)")
             assertEquals(0xCB, maxOf(r, g, b), "Maximum RGB channel should match light teal ceiling (0xCB)")
         }
+    }
+
+    @Test
+    fun `custom saturation and angle step control trail colors`() {
+        GestureTrailDrawingPoints.resetStrokeColorIndexForTest()
+
+        // Angle step 0° keeps the default teal hue constant across swipes
+        val stepZeroColors = (0 until 5).map { GestureTrailDrawingPoints.nextTrailColor(37, 0) }
+        assertEquals(1, stepZeroColors.toSet().size, "0° angle step should keep trail color constant")
+        assertEquals(0xFF80CBC4.toInt(), stepZeroColors.first())
+
+        // Saturation 0% produces neutral light grey (all RGB channels equal to round(0.796 * 255) = 0xCB)
+        val desaturated = GestureTrailDrawingPoints.getTrailColorForIndex(3, 0, 138)
+        assertEquals(0xFFCBCBCB.toInt(), desaturated)
+
+        // Saturation 100% produces full-chroma color with floor 0x00 and ceiling 0xCB
+        val fullSaturation = GestureTrailDrawingPoints.getTrailColorForIndex(0, 100, 138)
+        val r = (fullSaturation ushr 16) and 0xFF
+        val g = (fullSaturation ushr 8) and 0xFF
+        val b = fullSaturation and 0xFF
+        assertEquals(0x00, minOf(r, g, b))
+        assertEquals(0xCB, maxOf(r, g, b))
+    }
+
+    @Test
+    fun `slider snaps to default value within snap window`() {
+        // 0..100 range with default 37: 2% window is [35, 39]
+        assertEquals(37f, snapSliderValueToDefault(36f, 37f, 0f..100f))
+        assertEquals(37f, snapSliderValueToDefault(38.5f, 37f, 0f..100f))
+        assertEquals(30f, snapSliderValueToDefault(30f, 37f, 0f..100f))
+
+        // Out-of-range default (e.g. 0 on 21..36) does not snap
+        assertEquals(21f, snapSliderValueToDefault(21f, 0f, 21f..36f))
     }
 
     @Test
@@ -63,10 +97,10 @@ class GestureTrailDrawingPointsTest {
 
         // First swipe
         strokePoints.onDownEvent(10, 20, 0)
-        trail.addStroke(strokePoints, startUptime)
+        trail.addStroke(strokePoints, startUptime, drawParams)
         strokePoints.onMoveEvent(50, 60, 40)
         strokePoints.onMoveEvent(90, 100, 80)
-        trail.addStroke(strokePoints, startUptime)
+        trail.addStroke(strokePoints, startUptime, drawParams)
 
         val firstStrokePointCount = trail.pointCountForTest
         assertTrue(firstStrokePointCount >= 3)
@@ -79,10 +113,10 @@ class GestureTrailDrawingPointsTest {
         ShadowSystemClock.advanceBy(Duration.ofMillis(500))
         val secondDownTime = SystemClock.uptimeMillis()
         strokePoints.onDownEvent(200, 210, 0)
-        trail.addStroke(strokePoints, secondDownTime)
+        trail.addStroke(strokePoints, secondDownTime, drawParams)
         strokePoints.onMoveEvent(260, 270, 50)
         strokePoints.onMoveEvent(320, 330, 100)
-        trail.addStroke(strokePoints, secondDownTime)
+        trail.addStroke(strokePoints, secondDownTime, drawParams)
 
         val totalPointsAfterSecond = trail.pointCountForTest
         assertTrue(totalPointsAfterSecond > firstStrokePointCount)

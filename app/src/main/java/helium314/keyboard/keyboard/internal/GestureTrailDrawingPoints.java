@@ -14,6 +14,7 @@ import android.graphics.Rect;
 import android.os.SystemClock;
 
 import helium314.keyboard.latin.common.ResizableIntArray;
+import helium314.keyboard.latin.settings.Defaults;
 
 /**
  * This class holds drawing points to represent a gesture trail. The gesture trail may contain
@@ -28,18 +29,23 @@ final class GestureTrailDrawingPoints {
     public static final int POINT_TYPE_SAMPLED = 1;
     public static final int POINT_TYPE_INTERPOLATED = 2;
 
-    // Default OpenBoard/Material Teal 200 (#80CBC4) in HSV: H = 174.4°, S = 0.369, V = 0.796.
-    // Every new gesture stroke advances the hue by the golden angle (~137.5°) while keeping the
-    // same light saturation and value so consecutive swipes get distinct light pastel colors.
+    // Default OpenBoard/Material Teal 200 (#80CBC4) in HSV: H = 174.4°, S = 37% (0.37), V = 0.796.
+    // Every new gesture stroke advances the hue by the configured angle step (default 138°, matching
+    // the golden angle ~137.5°) while using the configured saturation (0..100%) and light value V.
     static final float DEFAULT_TEAL_HUE = 174.4f;
-    static final float TRAIL_SATURATION = 0.369f;
     static final float TRAIL_VALUE = 0.796f;
-    static final float GOLDEN_ANGLE_DEGREES = 137.50776f;
 
     private static int sNextStrokeColorIndex = 0;
 
     static synchronized int nextTrailColor() {
-        final int color = getTrailColorForIndex(sNextStrokeColorIndex);
+        return nextTrailColor(
+                Defaults.PREF_GESTURE_TRAIL_COLOR_SATURATION,
+                Defaults.PREF_GESTURE_TRAIL_COLOR_HUE_STEP);
+    }
+
+    static synchronized int nextTrailColor(final int saturationPercent, final int hueStepDegrees) {
+        final int color = getTrailColorForIndex(
+                sNextStrokeColorIndex, saturationPercent, hueStepDegrees);
         sNextStrokeColorIndex++;
         return color;
     }
@@ -49,8 +55,18 @@ final class GestureTrailDrawingPoints {
     }
 
     static int getTrailColorForIndex(final int index) {
-        final float hue = (DEFAULT_TEAL_HUE + (index & 0x7fffffff) * GOLDEN_ANGLE_DEGREES) % 360.0f;
-        return hsvToColor(0xFF, hue, TRAIL_SATURATION, TRAIL_VALUE);
+        return getTrailColorForIndex(
+                index,
+                Defaults.PREF_GESTURE_TRAIL_COLOR_SATURATION,
+                Defaults.PREF_GESTURE_TRAIL_COLOR_HUE_STEP);
+    }
+
+    static int getTrailColorForIndex(final int index, final int saturationPercent,
+            final int hueStepDegrees) {
+        final int clampedStep = Math.max(0, Math.min(360, hueStepDegrees));
+        final float saturation = Math.max(0.0f, Math.min(1.0f, saturationPercent / 100.0f));
+        final float hue = (DEFAULT_TEAL_HUE + (index & 0x7fffffff) * (float)clampedStep) % 360.0f;
+        return hsvToColor(0xFF, hue, saturation, TRAIL_VALUE);
     }
 
     static int hsvToColor(final int alpha, final float hue, final float saturation,
@@ -126,12 +142,31 @@ final class GestureTrailDrawingPoints {
     }
 
     public void addStroke(final GestureStrokeDrawingPoints stroke, final long downTime) {
+        addStroke(stroke, downTime,
+                Defaults.PREF_GESTURE_TRAIL_COLOR_SATURATION,
+                Defaults.PREF_GESTURE_TRAIL_COLOR_HUE_STEP);
+    }
+
+    public void addStroke(final GestureStrokeDrawingPoints stroke, final long downTime,
+            final GestureTrailDrawingParams params) {
+        final int saturation = (params != null)
+                ? params.mTrailColorSaturation
+                : Defaults.PREF_GESTURE_TRAIL_COLOR_SATURATION;
+        final int hueStep = (params != null)
+                ? params.mTrailColorHueStep
+                : Defaults.PREF_GESTURE_TRAIL_COLOR_HUE_STEP;
+        addStroke(stroke, downTime, saturation, hueStep);
+    }
+
+    public void addStroke(final GestureStrokeDrawingPoints stroke, final long downTime,
+            final int saturationPercent, final int hueStepDegrees) {
         synchronized (mEventTimes) {
-            addStrokeLocked(stroke, downTime);
+            addStrokeLocked(stroke, downTime, saturationPercent, hueStepDegrees);
         }
     }
 
-    private void addStrokeLocked(final GestureStrokeDrawingPoints stroke, final long downTime) {
+    private void addStrokeLocked(final GestureStrokeDrawingPoints stroke, final long downTime,
+            final int saturationPercent, final int hueStepDegrees) {
         final int trailSize = mEventTimes.getLength();
         stroke.appendPreviewStroke(mEventTimes, mXCoordinates, mYCoordinates, mPointTypes);
         if (mEventTimes.getLength() == trailSize) {
@@ -161,7 +196,7 @@ final class GestureTrailDrawingPoints {
             xCoords[trailSize] = markAsDownEvent(xCoords[trailSize]);
             mCurrentTimeBase = downTime - eventTimes[trailSize];
             mCurrentStrokeId = strokeId;
-            mCurrentStrokeColor = nextTrailColor();
+            mCurrentStrokeColor = nextTrailColor(saturationPercent, hueStepDegrees);
         }
         final int newTrailSize = mEventTimes.getLength();
         if (newTrailSize > lastInterpolatedIndex) {

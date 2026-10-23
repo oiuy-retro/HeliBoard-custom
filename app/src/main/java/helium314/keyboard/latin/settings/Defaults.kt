@@ -137,6 +137,8 @@ object Defaults {
     const val PREF_GESTURE_SPACE_AWARE = false
     const val PREF_GESTURE_FAST_TYPING_COOLDOWN = 500
     const val PREF_GESTURE_TRAIL_FADEOUT_DURATION = 800
+    const val PREF_GESTURE_TRAIL_COLOR_SATURATION = 37
+    const val PREF_GESTURE_TRAIL_COLOR_HUE_STEP = 138
     const val PREF_SHOW_SETUP_WIZARD_ICON = true
     const val PREF_USE_CONTACTS = false
     const val PREF_USE_APPS = false

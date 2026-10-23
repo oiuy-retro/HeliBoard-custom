@@ -10,7 +10,9 @@ import android.content.res.TypedArray;
 
 import helium314.keyboard.latin.R;
 import helium314.keyboard.latin.common.ColorType;
+import helium314.keyboard.latin.settings.Defaults;
 import helium314.keyboard.latin.settings.Settings;
+import helium314.keyboard.latin.settings.SettingsValues;
 
 /**
  * This class holds parameters to control how a gesture trail is drawn and animated on the screen.
@@ -32,6 +34,8 @@ final class GestureTrailDrawingParams {
     public final int mFadeoutStartDelay;
     public final int mFadeoutDuration;
     public final int mUpdateInterval;
+    public final int mTrailColorSaturation;
+    public final int mTrailColorHueStep;
 
     public final int mTrailLingerDuration;
 
@@ -45,6 +49,24 @@ final class GestureTrailDrawingParams {
             final int fadeoutStartDelay,
             final int fadeoutDuration,
             final int updateInterval) {
+        this(trailColor, trailStartWidth, trailEndWidth, trailBodyRatio, trailShadowEnabled,
+                trailShadowRatio, fadeoutStartDelay, fadeoutDuration, updateInterval,
+                Defaults.PREF_GESTURE_TRAIL_COLOR_SATURATION,
+                Defaults.PREF_GESTURE_TRAIL_COLOR_HUE_STEP);
+    }
+
+    GestureTrailDrawingParams(
+            final int trailColor,
+            final float trailStartWidth,
+            final float trailEndWidth,
+            final float trailBodyRatio,
+            final boolean trailShadowEnabled,
+            final float trailShadowRatio,
+            final int fadeoutStartDelay,
+            final int fadeoutDuration,
+            final int updateInterval,
+            final int trailColorSaturation,
+            final int trailColorHueStep) {
         mTrailColor = trailColor;
         mTrailStartWidth = trailStartWidth;
         mTrailEndWidth = trailEndWidth;
@@ -55,10 +77,13 @@ final class GestureTrailDrawingParams {
         mFadeoutDuration = fadeoutDuration;
         mTrailLingerDuration = mFadeoutStartDelay + mFadeoutDuration;
         mUpdateInterval = updateInterval;
+        mTrailColorSaturation = trailColorSaturation;
+        mTrailColorHueStep = trailColorHueStep;
     }
 
     public GestureTrailDrawingParams(final TypedArray mainKeyboardViewAttr) {
-        mTrailColor = Settings.getValues().mColors.get(ColorType.GESTURE_TRAIL);
+        final SettingsValues sv = Settings.getValues();
+        mTrailColor = sv.mColors.get(ColorType.GESTURE_TRAIL);
         mTrailStartWidth = mainKeyboardViewAttr.getDimension(
                 R.styleable.MainKeyboardView_gestureTrailStartWidth, 0.0f);
         mTrailEndWidth = mainKeyboardViewAttr.getDimension(
@@ -77,9 +102,11 @@ final class GestureTrailDrawingParams {
                         R.styleable.MainKeyboardView_gestureTrailFadeoutStartDelay, 0);
         mFadeoutDuration = GestureTrailDrawingPoints.DEBUG_SHOW_POINTS
                 ? FADEOUT_DURATION_FOR_DEBUG
-                : Settings.getValues().mGestureTrailFadeoutDuration;
+                : sv.mGestureTrailFadeoutDuration;
         mTrailLingerDuration = mFadeoutStartDelay + mFadeoutDuration;
         mUpdateInterval = mainKeyboardViewAttr.getInt(
                 R.styleable.MainKeyboardView_gestureTrailUpdateInterval, 0);
+        mTrailColorSaturation = sv.mGestureTrailColorSaturation;
+        mTrailColorHueStep = sv.mGestureTrailColorHueStep;
     }
 }

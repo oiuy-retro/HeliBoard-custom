@@ -44,6 +44,7 @@ fun GestureTypingScreen(
         Log.v("irrelevant", "stupid way to trigger recomposition on preference change")
     val gestureFloatingPreviewEnabled = prefs.getBoolean(Settings.PREF_GESTURE_FLOATING_PREVIEW_TEXT, Defaults.PREF_GESTURE_FLOATING_PREVIEW_TEXT)
     val gestureEnabled = prefs.getBoolean(Settings.PREF_GESTURE_INPUT, Defaults.PREF_GESTURE_INPUT)
+    val gestureTrailEnabled = prefs.getBoolean(Settings.PREF_GESTURE_PREVIEW_TRAIL, Defaults.PREF_GESTURE_PREVIEW_TRAIL)
     val items = listOf(
         Settings.PREF_GESTURE_INPUT,
         if (gestureEnabled)
@@ -56,10 +57,13 @@ fun GestureTypingScreen(
             Settings.PREF_GESTURE_SPACE_AWARE else null,
         if (gestureEnabled)
             Settings.PREF_GESTURE_FAST_TYPING_COOLDOWN else null,
-        if (gestureEnabled &&
-            (prefs.getBoolean(Settings.PREF_GESTURE_PREVIEW_TRAIL, Defaults.PREF_GESTURE_PREVIEW_TRAIL) || gestureFloatingPreviewEnabled))
-            Settings.PREF_GESTURE_TRAIL_FADEOUT_DURATION else null
-        )
+        if (gestureEnabled && (gestureTrailEnabled || gestureFloatingPreviewEnabled))
+            Settings.PREF_GESTURE_TRAIL_FADEOUT_DURATION else null,
+        if (gestureEnabled && gestureTrailEnabled)
+            Settings.PREF_GESTURE_TRAIL_COLOR_SATURATION else null,
+        if (gestureEnabled && gestureTrailEnabled)
+            Settings.PREF_GESTURE_TRAIL_COLOR_HUE_STEP else null,
+    )
     SearchSettingsScreen(
         onClickBack = onClickBack,
         title = stringResource(R.string.settings_screen_gesture),
@@ -111,6 +115,26 @@ fun createGestureTypingSettings(context: Context) = listOf(
     Setting(context, Settings.PREF_GESTURE_TRAIL_FADEOUT_DURATION, R.string.gesture_trail_fadeout_duration) { def ->
         GestureTrailLifespanPreference(def.title, def.key)
     },
+    Setting(context, Settings.PREF_GESTURE_TRAIL_COLOR_SATURATION, R.string.gesture_trail_color_saturation) { def ->
+        SliderPreference(
+            name = def.title,
+            key = def.key,
+            default = Defaults.PREF_GESTURE_TRAIL_COLOR_SATURATION,
+            range = 0f..100f,
+            stepSize = 1,
+            description = { "$it%" }
+        ) { KeyboardSwitcher.getInstance().setThemeNeedsReload() }
+    },
+    Setting(context, Settings.PREF_GESTURE_TRAIL_COLOR_HUE_STEP, R.string.gesture_trail_color_hue_step) { def ->
+        SliderPreference(
+            name = def.title,
+            key = def.key,
+            default = Defaults.PREF_GESTURE_TRAIL_COLOR_HUE_STEP,
+            range = 0f..180f,
+            stepSize = 1,
+            description = { "$it°" }
+        ) { KeyboardSwitcher.getInstance().setThemeNeedsReload() }
+    },
 )
 
 // Stored value is the fade-out duration (the shown lifespan adds the 100 ms fade-out start delay).
@@ -138,6 +162,7 @@ private fun GestureTrailLifespanPreference(name: String, key: String) {
     if ((b?.value ?: 0) < 0)
         Log.v("irrelevant", "stupid way to trigger recomposition on preference change")
     val current = prefs.getInt(key, Defaults.PREF_GESTURE_TRAIL_FADEOUT_DURATION)
+    val defaultPosition = positionFromTrailFadeout(Defaults.PREF_GESTURE_TRAIL_FADEOUT_DURATION)
     var showDialog by rememberSaveable { mutableStateOf(false) }
     Preference(
         name = name,
@@ -153,6 +178,8 @@ private fun GestureTrailLifespanPreference(name: String, key: String) {
             },
             initialValue = positionFromTrailFadeout(current),
             range = 0f..1f,
+            defaultValue = defaultPosition,
+            isDefaultValue = { trailFadeoutFromPosition(it) == Defaults.PREF_GESTURE_TRAIL_FADEOUT_DURATION },
             positionString = {
                 stringResource(R.string.abbreviation_unit_milliseconds, (trailFadeoutFromPosition(it) + 100).toString())
             },

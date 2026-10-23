@@ -29,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -39,6 +40,8 @@ import helium314.keyboard.latin.utils.prefs
 import helium314.keyboard.latin.utils.Theme
 import helium314.keyboard.settings.WithSmallTitle
 import helium314.keyboard.settings.dialogs.ThreeButtonAlertDialog
+import helium314.keyboard.settings.dialogs.performSliderDefaultSnapHaptic
+import helium314.keyboard.settings.dialogs.snapSliderValueToDefault
 import helium314.keyboard.latin.utils.previewDark
 import androidx.core.content.edit
 
@@ -92,6 +95,7 @@ private fun KeyboardScaleDialog(
     val (variants, keys) = createVariantsAndKeys(dimensions, baseKey)
     val foldedString = stringResource(R.string.folded) // we want to hide foldable settings for non-foldable phones
     val ctx = LocalContext.current
+    val view = LocalView.current
     var checked by remember { mutableStateOf(dimensions.map { FoldableUtils.isFoldable || !it.contains(foldedString) }) }
     val prefs = ctx.prefs()
     val done = remember { mutableMapOf<String, () -> Unit>() }
@@ -118,10 +122,12 @@ private fun KeyboardScaleDialog(
                     }
                     variants.forEachIndexed { i, variant ->
                         val key = keys[i]
-                        var sliderPosition by remember { mutableFloatStateOf(prefs.getFloat(key, defaultValues[i])) }
+                        val defaultVal = defaultValues[i]
+                        var sliderPosition by remember { mutableFloatStateOf(prefs.getFloat(key, defaultVal)) }
+                        var wasAtDefault by remember { mutableStateOf(sliderPosition == defaultVal) }
                         if (!done.contains(variant))
                             done[variant] = {
-                                if (sliderPosition == defaultValues[i])
+                                if (sliderPosition == defaultVal)
                                     prefs.edit { remove(key) }
                                 else
                                     prefs.edit { putFloat(key, sliderPosition) }
@@ -133,7 +139,15 @@ private fun KeyboardScaleDialog(
                             WithSmallTitle(variant.ifEmpty { stringResource(R.string.button_default) }) {
                                 Slider(
                                     value = sliderPosition,
-                                    onValueChange = { sliderPosition = it },
+                                    onValueChange = { raw ->
+                                        val snapped = snapSliderValueToDefault(raw, defaultVal, range)
+                                        val nowAtDefault = snapped == defaultVal
+                                        if (nowAtDefault && !wasAtDefault) {
+                                            performSliderDefaultSnapHaptic(view)
+                                        }
+                                        wasAtDefault = nowAtDefault
+                                        sliderPosition = snapped
+                                    },
                                     valueRange = range,
                                 )
                                 Row(
@@ -142,7 +156,10 @@ private fun KeyboardScaleDialog(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Text(positionString(sliderPosition))
-                                    TextButton({ sliderPosition = defaultValues[i] }) { Text(stringResource(R.string.button_default)) }
+                                    TextButton({
+                                        sliderPosition = defaultVal
+                                        wasAtDefault = true
+                                    }) { Text(stringResource(R.string.button_default)) }
                                 }
                                 Spacer(Modifier.height(6.dp))
                             }
