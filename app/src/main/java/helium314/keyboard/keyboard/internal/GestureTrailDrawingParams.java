@@ -35,6 +35,28 @@ final class GestureTrailDrawingParams {
 
     public final int mTrailLingerDuration;
 
+    GestureTrailDrawingParams(
+            final int trailColor,
+            final float trailStartWidth,
+            final float trailEndWidth,
+            final float trailBodyRatio,
+            final boolean trailShadowEnabled,
+            final float trailShadowRatio,
+            final int fadeoutStartDelay,
+            final int fadeoutDuration,
+            final int updateInterval) {
+        mTrailColor = trailColor;
+        mTrailStartWidth = trailStartWidth;
+        mTrailEndWidth = trailEndWidth;
+        mTrailBodyRatio = trailBodyRatio;
+        mTrailShadowEnabled = trailShadowEnabled;
+        mTrailShadowRatio = trailShadowRatio;
+        mFadeoutStartDelay = fadeoutStartDelay;
+        mFadeoutDuration = fadeoutDuration;
+        mTrailLingerDuration = mFadeoutStartDelay + mFadeoutDuration;
+        mUpdateInterval = updateInterval;
+    }
+
     public GestureTrailDrawingParams(final TypedArray mainKeyboardViewAttr) {
         mTrailColor = Settings.getValues().mColors.get(ColorType.GESTURE_TRAIL);
         mTrailStartWidth = mainKeyboardViewAttr.getDimension(

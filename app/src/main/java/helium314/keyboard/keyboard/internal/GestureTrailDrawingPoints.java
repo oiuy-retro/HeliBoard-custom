@@ -28,15 +28,82 @@ final class GestureTrailDrawingPoints {
     public static final int POINT_TYPE_SAMPLED = 1;
     public static final int POINT_TYPE_INTERPOLATED = 2;
 
+    // Default OpenBoard/Material Teal 200 (#80CBC4) in HSV: H = 174.4°, S = 0.369, V = 0.796.
+    // Every new gesture stroke advances the hue by the golden angle (~137.5°) while keeping the
+    // same light saturation and value so consecutive swipes get distinct light pastel colors.
+    static final float DEFAULT_TEAL_HUE = 174.4f;
+    static final float TRAIL_SATURATION = 0.369f;
+    static final float TRAIL_VALUE = 0.796f;
+    static final float GOLDEN_ANGLE_DEGREES = 137.50776f;
+
+    private static int sNextStrokeColorIndex = 0;
+
+    static synchronized int nextTrailColor() {
+        final int color = getTrailColorForIndex(sNextStrokeColorIndex);
+        sNextStrokeColorIndex++;
+        return color;
+    }
+
+    static synchronized void resetStrokeColorIndexForTest() {
+        sNextStrokeColorIndex = 0;
+    }
+
+    static int getTrailColorForIndex(final int index) {
+        final float hue = (DEFAULT_TEAL_HUE + (index & 0x7fffffff) * GOLDEN_ANGLE_DEGREES) % 360.0f;
+        return hsvToColor(0xFF, hue, TRAIL_SATURATION, TRAIL_VALUE);
+    }
+
+    static int hsvToColor(final int alpha, final float hue, final float saturation,
+            final float value) {
+        final float h = ((hue % 360.0f) + 360.0f) % 360.0f;
+        final float c = value * saturation;
+        final float x = c * (1.0f - Math.abs(((h / 60.0f) % 2.0f) - 1.0f));
+        final float m = value - c;
+        final float rPrime;
+        final float gPrime;
+        final float bPrime;
+        if (h < 60.0f) {
+            rPrime = c;
+            gPrime = x;
+            bPrime = 0.0f;
+        } else if (h < 120.0f) {
+            rPrime = x;
+            gPrime = c;
+            bPrime = 0.0f;
+        } else if (h < 180.0f) {
+            rPrime = 0.0f;
+            gPrime = c;
+            bPrime = x;
+        } else if (h < 240.0f) {
+            rPrime = 0.0f;
+            gPrime = x;
+            bPrime = c;
+        } else if (h < 300.0f) {
+            rPrime = x;
+            gPrime = 0.0f;
+            bPrime = c;
+        } else {
+            rPrime = c;
+            gPrime = 0.0f;
+            bPrime = x;
+        }
+        final int r = Math.min(255, Math.max(0, Math.round((rPrime + m) * 255.0f)));
+        final int g = Math.min(255, Math.max(0, Math.round((gPrime + m) * 255.0f)));
+        final int b = Math.min(255, Math.max(0, Math.round((bPrime + m) * 255.0f)));
+        return ((alpha & 0xFF) << 24) | (r << 16) | (g << 8) | b;
+    }
+
     private static final int DEFAULT_CAPACITY = GestureStrokeDrawingPoints.PREVIEW_CAPACITY;
 
-    // These three {@link ResizableIntArray}s should be synchronized by {@link #mEventTimes}.
+    // These {@link ResizableIntArray}s should be synchronized by {@link #mEventTimes}.
     private final ResizableIntArray mXCoordinates = new ResizableIntArray(DEFAULT_CAPACITY);
     private final ResizableIntArray mYCoordinates = new ResizableIntArray(DEFAULT_CAPACITY);
     private final ResizableIntArray mEventTimes = new ResizableIntArray(DEFAULT_CAPACITY);
+    private final ResizableIntArray mPointColors = new ResizableIntArray(DEFAULT_CAPACITY);
     private final ResizableIntArray mPointTypes = new ResizableIntArray(
             DEBUG_SHOW_POINTS ? DEFAULT_CAPACITY : 0);
     private int mCurrentStrokeId = -1;
+    private int mCurrentStrokeColor = getTrailColorForIndex(0);
     // The wall time of the zero value in {@link #mEventTimes}
     private long mCurrentTimeBase;
     private int mTrailStartIndex;
@@ -94,6 +161,31 @@ final class GestureTrailDrawingPoints {
             xCoords[trailSize] = markAsDownEvent(xCoords[trailSize]);
             mCurrentTimeBase = downTime - eventTimes[trailSize];
             mCurrentStrokeId = strokeId;
+            mCurrentStrokeColor = nextTrailColor();
+        }
+        final int newTrailSize = mEventTimes.getLength();
+        if (newTrailSize > lastInterpolatedIndex) {
+            mPointColors.fill(mCurrentStrokeColor, lastInterpolatedIndex,
+                    newTrailSize - lastInterpolatedIndex);
+        }
+        mPointColors.setLength(newTrailSize);
+    }
+
+    int getPointCountForTest() {
+        synchronized (mEventTimes) {
+            return mEventTimes.getLength();
+        }
+    }
+
+    int getPointColorForTest(final int index) {
+        synchronized (mEventTimes) {
+            return mPointColors.get(index);
+        }
+    }
+
+    boolean isDownEventPointForTest(final int index) {
+        synchronized (mEventTimes) {
+            return isDownEventXCoord(mXCoordinates.get(index));
         }
     }
 
@@ -105,10 +197,11 @@ final class GestureTrailDrawingPoints {
      *
      * @param elapsedTime the elapsed time since a trail has been made.
      * @param params gesture trail display parameters
-     * @return the width of a gesture trail
+     * @return the alpha of a gesture trail
      */
     private static int getAlpha(final int elapsedTime, final GestureTrailDrawingParams params) {
-        final int fullAlpha = Color.alpha(params.mTrailColor);
+        final int paramAlpha = params.mTrailColor >>> 24;
+        final int fullAlpha = (paramAlpha != 0) ? paramAlpha : 0xFF;
         if (elapsedTime < params.mFadeoutStartDelay) {
             return fullAlpha;
         }
@@ -162,6 +255,7 @@ final class GestureTrailDrawingPoints {
         final int[] eventTimes = mEventTimes.getPrimitiveArray();
         final int[] xCoords = mXCoordinates.getPrimitiveArray();
         final int[] yCoords = mYCoordinates.getPrimitiveArray();
+        final int[] pointColors = mPointColors.getPrimitiveArray();
         final int[] pointTypes = mPointTypes.getPrimitiveArray();
         final int sinceDown = (int)(SystemClock.uptimeMillis() - mCurrentTimeBase);
         int startIndex;
@@ -175,7 +269,6 @@ final class GestureTrailDrawingPoints {
         mTrailStartIndex = startIndex;
 
         if (startIndex < trailSize) {
-            paint.setColor(params.mTrailColor);
             paint.setStyle(Paint.Style.FILL);
             final RoundedLine roundedLine = mRoundedLine;
             int p1x = getXCoordValue(xCoords[startIndex]);
@@ -193,10 +286,12 @@ final class GestureTrailDrawingPoints {
                     final float body2 = r2 * params.mTrailBodyRatio;
                     final Path path = roundedLine.makePath(p1x, p1y, body1, p2x, p2y, body2);
                     if (!path.isEmpty()) {
+                        final int trailColor = pointColors[i];
+                        paint.setColor(trailColor);
                         roundedLine.getBounds(mRoundedLineBounds);
                         if (params.mTrailShadowEnabled) {
                             final float shadow2 = r2 * params.mTrailShadowRatio;
-                            paint.setShadowLayer(shadow2, 0.0f, 0.0f, params.mTrailColor);
+                            paint.setShadowLayer(shadow2, 0.0f, 0.0f, trailColor);
                             final int shadowInset = -(int)Math.ceil(shadow2);
                             mRoundedLineBounds.inset(shadowInset, shadowInset);
                         }
@@ -223,6 +318,7 @@ final class GestureTrailDrawingPoints {
                 System.arraycopy(eventTimes, startIndex, eventTimes, 0, newSize);
                 System.arraycopy(xCoords, startIndex, xCoords, 0, newSize);
                 System.arraycopy(yCoords, startIndex, yCoords, 0, newSize);
+                System.arraycopy(pointColors, startIndex, pointColors, 0, newSize);
                 if (DEBUG_SHOW_POINTS) {
                     System.arraycopy(pointTypes, startIndex, pointTypes, 0, newSize);
                 }
@@ -230,6 +326,7 @@ final class GestureTrailDrawingPoints {
             mEventTimes.setLength(newSize);
             mXCoordinates.setLength(newSize);
             mYCoordinates.setLength(newSize);
+            mPointColors.setLength(newSize);
             if (DEBUG_SHOW_POINTS) {
                 mPointTypes.setLength(newSize);
             }

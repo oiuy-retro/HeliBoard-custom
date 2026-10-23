@@ -40,7 +40,8 @@ All of these work in this custom build too. Where the build behaves differently,
 - **Emoji** keyboard, and emoji search if an emoji dictionary is loaded.
 - **One-handed mode**, **split keyboard**, **floating keyboard** and a **number pad**.
 - **Glide (gesture) typing** needs a closed-source library that isn't included in the app. You have to
-  get it yourself and load it in the settings. Upstream's wiki explains where to find it.
+  get it yourself and load it in the settings. Upstream's wiki explains where to find it. In this build
+  the gesture trail lifespan goes up to 20 s and each swipe uses a new light color (see the README).
 - **Backup and restore** of settings, learned words and history to a file. This is also how you move
   settings between official HeliBoard and this build.
 

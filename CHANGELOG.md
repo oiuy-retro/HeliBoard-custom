@@ -3,24 +3,35 @@
 All notable changes to this custom build of HeliBoard are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-All custom releases keep upstream's version name **4.3-beta1** and versionCode **4300**, and are
-built from upstream `main` at `e97acdbe` (the `v4.3-beta1` tag). They're published as GitHub
-prereleases and told apart by their tag. From `custom-v1` on, they're release builds with the package
-`helium314.keyboard.custom`. The earlier test build was a debug build (`helium314.keyboard.debug`).
-For changes in the app itself, see the [upstream project](https://github.com/HeliBorg/HeliBoard).
+All custom releases keep upstream's version name **4.3-beta1** (`versionCode` 4300 in `custom-v1`,
+4301 in `custom-v2`) and are built from upstream `main` at `e97acdbe` (the `v4.3-beta1` tag). They're
+published as GitHub prereleases and told apart by their tag. From `custom-v1` on, they're release
+builds with the package `helium314.keyboard.custom`. The earlier test build was a debug build
+(`helium314.keyboard.debug`). For changes in the app itself, see the
+[upstream project](https://github.com/HeliBorg/HeliBoard).
 
-## [Unreleased]
-
-Documentation only. No new APK.
+## [custom-v2] - 2026-10-22
 
 ### Changed
+- **Gesture trail changes color on every swipe.** Each new gesture stroke steps the hue by the golden
+  angle (~137.5°) starting from OpenBoard's default light teal (`#80CBC4`), keeping the same light HSV
+  saturation (36.9 %) and value (79.6 %) so every swipe is a distinct light pastel color.
+- **Lingering gesture trails keep their own color.** `GestureTrailDrawingPoints` now stores the stroke
+  color per point (`mPointColors`), so when multiple trails stay on screen at once (up to 20 s),
+  earlier strokes keep the color they were swiped with while fading out.
+- `versionCode` bumped from `4300` to `4301` so `custom-v2` installs cleanly as an update over
+  `custom-v1`.
 - `docs/UPSTREAM_README.md` (a copy of upstream's README) is replaced by
   [docs/ABOUT_HELIBOARD.md](docs/ABOUT_HELIBOARD.md), a short description of HeliBoard in this
   repository's style: what it is, its features (with notes where this build differs), links to
   upstream's README, wiki, FAQ and contributing guide, and the licenses. Links in the README and
   docs are updated.
 - README: blockquote and "Building from source" wording aligned with the other custom repositories,
-  and the intro now mentions the longer gesture trail.
+  and updated for the per-swipe gesture trail colors.
+
+### Added
+- Unit tests in `GestureTrailDrawingPointsTest` checking the per-swipe light color sequence and that
+  lingering strokes retain their own color when new strokes are added and drawn.
 
 ## [custom-v1] - 2026-10-22
 
@@ -69,5 +80,6 @@ Debug test build, package `helium314.keyboard.debug`.
 ### Added
 - Unit test `symbols layouts match OpenBoard`.
 
+[custom-v2]: https://github.com/oiuy-retro/HeliBoard-custom/releases/tag/custom-v2
 [custom-v1]: https://github.com/oiuy-retro/HeliBoard-custom/releases/tag/custom-v1
 [openboard-layout-debug-1]: https://github.com/oiuy-retro/HeliBoard-custom/releases/tag/openboard-layout-debug-1

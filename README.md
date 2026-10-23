@@ -1,6 +1,6 @@
 # HeliBoard — Custom Build
 
-A personal build of the HeliBoard keyboard with an OpenBoard-style suggestion strip, OpenBoard's symbol layouts, a clipboard view without the bottom key row, a longer gesture trail and an inverted launcher icon. It installs next to official HeliBoard.
+A personal build of the HeliBoard keyboard with an OpenBoard-style suggestion strip, OpenBoard's symbol layouts, a clipboard view without the bottom key row, a longer gesture trail that changes color on every swipe, and an inverted launcher icon. It installs next to official HeliBoard.
 
 > **This is an unofficial custom build.** It is based on
 > [HeliBoard](https://github.com/HeliBorg/HeliBoard) by Helium314 and the HeliBoard contributors
@@ -13,7 +13,7 @@ A personal build of the HeliBoard keyboard with an OpenBoard-style suggestion st
 > original README is at <https://github.com/HeliBorg/HeliBoard/blob/main/README.md>.
 
 - Based on upstream `main` at commit `e97acdbe` (the `v4.3-beta1` tag, 2026-10-18).
-- App version: **4.3-beta1**, versionCode **4300** (both unchanged from upstream).
+- App version: **4.3-beta1**, versionCode **4301** (upstream is 4300).
 - Package name **`helium314.keyboard.custom`**, app name **HeliBoard Custom**.
 - Published builds are **release** builds, signed with this build's own key (see Signing).
 - See [CHANGELOG.md](CHANGELOG.md) for the history of the custom releases.
@@ -101,9 +101,18 @@ The `?123` page now has 4 rows instead of 5:
 - The Java/Kotlin code still uses the `helium314.keyboard` package names, so upstream changes merge
   as before.
 
-### 6. Longer gesture trail
+### 6. Longer gesture trail that changes color on every swipe
 
-- The **Gesture trail lifespan** slider (Settings → Gesture typing) now goes up to **20,000 ms (20 s)**
+- **New light color on every swipe.** Each gesture stroke picks a new light pastel color in the same
+  saturation and brightness family as OpenBoard's default light teal (`#80CBC4`, HSV saturation 36.9 %,
+  value 79.6 %). Starting from `#80CBC4` (hue 174.4°), each swipe steps the hue around the color wheel
+  by the golden angle (~137.5°): light teal (`#80CBC4`), rose (`#CB80BC`), sage green (`#A6CB80`),
+  periwinkle (`#8090CB`), coral (`#CB8680`), mint (`#80CB9B`), lavender (`#B180CB`), soft yellow
+  (`#CBC780`), sky blue (`#80B9CB`), pink (`#CB80A3`) and so on.
+- **Lingering trails keep their own color.** Each trail point stores the color of the swipe that drew
+  it. When several trails remain on screen at once (with a long lifespan), older strokes keep the color
+  they were swiped with while they fade out instead of switching to the new swipe's color.
+- The **Gesture trail lifespan** slider (Settings → Gesture typing) goes up to **20,000 ms (20 s)**
   instead of 2,000 ms. The minimum (200 ms) and the default (900 ms) are unchanged.
 - The slider isn't linear: the old range up to 2 s takes about the first 30 % of it, in 10 ms steps.
   Above 2 s it moves in 50 ms steps.
@@ -183,10 +192,10 @@ Debug builds (`./gradlew assembleDebug`) are always signed with the debug key an
 ## Known limitations
 
 - Testing: each release is built with `./gradlew assembleRelease` and checked with the unit tests.
-  One unit test checks the new symbol layouts. The top bar and symbol changes were tried by hand on one
-  phone (in the earlier debug test build). The clipboard change, the icon and the new package name
-  were built and unit-tested but not yet tried on a device. There is no automated on-device testing.
-- Unit tests: 194 run, 8 fail. The same 8 fail on unmodified upstream at `e97acdbe`: 5 tests marked
+  Unit tests check the new symbol layouts and the per-swipe gesture trail colors. The top bar, symbol
+  layouts, clipboard view, icon and package name were tried on a phone. There is no automated on-device
+  testing.
+- Unit tests: 196 run, 8 fail. The same 8 fail on unmodified upstream at `e97acdbe`: 5 tests marked
   as known failures (names ending in `Fails`) and 3 link checks (`XLinkTest`) that need internet access.
 - Only the **release** variant is published. Upstream's other build types (`nouserlib`, `runTests`,
   `debugNoMinify`) still build but haven't been tried. `nouserlib` isn't signed.

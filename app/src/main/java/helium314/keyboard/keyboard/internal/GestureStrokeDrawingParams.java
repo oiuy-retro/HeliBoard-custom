@@ -22,6 +22,13 @@ public final class GestureStrokeDrawingParams {
     private static final float DEFAULT_MAX_INTERPOLATION_DISTANCE_THRESHOLD = 0.0f; // dp
     private static final int DEFAULT_MAX_INTERPOLATION_SEGMENTS = 4;
 
+    GestureStrokeDrawingParams() {
+        mMinSamplingDistance = DEFAULT_MIN_SAMPLING_DISTANCE;
+        mMaxInterpolationAngularThreshold = Math.toRadians(DEFAULT_MAX_INTERPOLATION_ANGULAR_THRESHOLD);
+        mMaxInterpolationDistanceThreshold = 16.0d;
+        mMaxInterpolationSegments = DEFAULT_MAX_INTERPOLATION_SEGMENTS;
+    }
+
     public GestureStrokeDrawingParams(final TypedArray mainKeyboardViewAttr) {
         mMinSamplingDistance = mainKeyboardViewAttr.getDimension(
                 R.styleable.MainKeyboardView_gestureTrailMinSamplingDistance,

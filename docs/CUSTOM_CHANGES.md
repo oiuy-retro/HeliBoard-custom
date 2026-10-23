@@ -71,10 +71,13 @@ The adaptive icon's monochrome layer uses the same foreground drawable. Android 
 theme color, so only its shape matters and that's unchanged. Transparent stroke colors
 (`#00000000` → `#00FFFFFF`) stay invisible.
 
-## 5. Gesture trail lifespan
+## 5. Gesture trail lifespan and per-swipe color
 
 | File | Change |
 |---|---|
+| `app/src/main/java/helium314/keyboard/keyboard/internal/GestureTrailDrawingPoints.java` | Each new stroke (`strokeId != mCurrentStrokeId`) picks a new color via `nextTrailColor()`, which steps the hue by the golden angle (`137.50776°`) starting from OpenBoard's default Teal 200 (`#80CBC4`, `H = 174.4°`, `S = 0.369`, `V = 0.796`). A parallel `ResizableIntArray mPointColors` stores the stroke color per trail point and is compacted alongside `mEventTimes`, `mXCoordinates` and `mYCoordinates`, so lingering trails from earlier swipes keep their own color when a new swipe starts. |
+| `app/src/main/java/helium314/keyboard/keyboard/internal/GestureStrokeDrawingParams.java`, `GestureTrailDrawingParams.java` | Package-private constructors for unit testing trail strokes and drawing parameters without a `TypedArray`. |
+| `app/src/test/java/helium314/keyboard/keyboard/internal/GestureTrailDrawingPointsTest.kt` | Unit tests verifying that consecutive strokes cycle through distinct light colors starting with `#80CBC4` and that lingering strokes keep their own color when new strokes are added and drawn. |
 | `app/src/main/java/helium314/keyboard/settings/screens/GestureTypingScreen.kt` | The `PREF_GESTURE_TRAIL_FADEOUT_DURATION` setting uses a custom slider (`GestureTrailLifespanPreference`) instead of `SliderPreference`. The slider position `p` (0–1) maps to a fade-out of `100 + 19800 × p²` ms, rounded to 10 ms below 1900 ms and to 50 ms above. The shown lifespan adds the 100 ms fade-out start delay, so 200 ms – 20 s. The stored value and the default (800, shown as 900 ms) are unchanged. |
 | `app/src/main/java/helium314/keyboard/keyboard/MainKeyboardView.java` | `mGestureFloatingPreviewTextLingerTimeout = min(duration / 4, 475)`. 475 ms is the old maximum (1900 / 4). |
 
