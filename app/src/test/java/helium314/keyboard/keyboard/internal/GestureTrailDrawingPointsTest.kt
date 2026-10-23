@@ -33,7 +33,7 @@ class GestureTrailDrawingPointsTest {
         assertEquals(12, colors.toSet().size, "Each consecutive swipe should get a distinct color")
         assertEquals(0xFF80CBC4.toInt(), colors.first())
 
-        // Every generated color must have the same light HSV saturation (37%) and value (79.6%) as #80CBC4
+        // Every generated color must have the same light HSV saturation (37%) and value (79.6% / default 80%) as #80CBC4
         // (RGB channels bounded between 0x80 and 0xCB).
         for (color in colors) {
             val r = (color ushr 16) and 0xFF
@@ -46,25 +46,36 @@ class GestureTrailDrawingPointsTest {
     }
 
     @Test
-    fun `custom saturation and angle step control trail colors`() {
+    fun `custom saturation, brightness, and angle step control trail colors`() {
         GestureTrailDrawingPoints.resetStrokeColorIndexForTest()
 
         // Angle step 0° keeps the default teal hue constant across swipes
-        val stepZeroColors = (0 until 5).map { GestureTrailDrawingPoints.nextTrailColor(37, 0) }
+        val stepZeroColors = (0 until 5).map { GestureTrailDrawingPoints.nextTrailColor(37, 80, 0) }
         assertEquals(1, stepZeroColors.toSet().size, "0° angle step should keep trail color constant")
         assertEquals(0xFF80CBC4.toInt(), stepZeroColors.first())
 
-        // Saturation 0% produces neutral light grey (all RGB channels equal to round(0.796 * 255) = 0xCB)
-        val desaturated = GestureTrailDrawingPoints.getTrailColorForIndex(3, 0, 138)
+        // Saturation 0% at default brightness (80%) produces neutral light grey (0xCB = 203)
+        val desaturated = GestureTrailDrawingPoints.getTrailColorForIndex(3, 0, 80, 138)
         assertEquals(0xFFCBCBCB.toInt(), desaturated)
 
-        // Saturation 100% produces full-chroma color with floor 0x00 and ceiling 0xCB
-        val fullSaturation = GestureTrailDrawingPoints.getTrailColorForIndex(0, 100, 138)
+        // Saturation 100% at default brightness (80%) produces full-chroma color with floor 0x00 and ceiling 0xCB
+        val fullSaturation = GestureTrailDrawingPoints.getTrailColorForIndex(0, 100, 80, 138)
         val r = (fullSaturation ushr 16) and 0xFF
         val g = (fullSaturation ushr 8) and 0xFF
         val b = fullSaturation and 0xFF
         assertEquals(0x00, minOf(r, g, b))
         assertEquals(0xCB, maxOf(r, g, b))
+
+        // Brightness 0% produces black (#000000)
+        val blackColor = GestureTrailDrawingPoints.getTrailColorForIndex(0, 37, 0, 138)
+        assertEquals(0xFF000000.toInt(), blackColor)
+
+        // Brightness 100% produces full value (max RGB channel = 0xFF)
+        val fullBrightness = GestureTrailDrawingPoints.getTrailColorForIndex(0, 37, 100, 138)
+        val rb = (fullBrightness ushr 16) and 0xFF
+        val gb = (fullBrightness ushr 8) and 0xFF
+        val bb = fullBrightness and 0xFF
+        assertEquals(0xFF, maxOf(rb, gb, bb))
     }
 
     @Test
@@ -81,6 +92,7 @@ class GestureTrailDrawingPointsTest {
 
         // Tick mark fraction for valid defaults
         assertEquals(0.37f, computeDefaultTickFraction(37f, 0f..100f)!!, 0.0001f)
+        assertEquals(0.80f, computeDefaultTickFraction(80f, 0f..100f)!!, 0.0001f)
         assertEquals(138f / 180f, computeDefaultTickFraction(138f, 0f..180f)!!, 0.0001f)
         assertEquals(0.5f, computeDefaultTickFraction(1.0f, 0.5f..1.5f)!!, 0.0001f)
 

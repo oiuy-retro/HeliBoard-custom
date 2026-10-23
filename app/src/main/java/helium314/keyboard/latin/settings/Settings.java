@@ -143,6 +143,7 @@ public final class Settings implements SharedPreferences.OnSharedPreferenceChang
     public static final String PREF_GESTURE_FAST_TYPING_COOLDOWN = "gesture_fast_typing_cooldown";
     public static final String PREF_GESTURE_TRAIL_FADEOUT_DURATION = "gesture_trail_fadeout_duration";
     public static final String PREF_GESTURE_TRAIL_COLOR_SATURATION = "gesture_trail_color_saturation";
+    public static final String PREF_GESTURE_TRAIL_COLOR_BRIGHTNESS = "gesture_trail_color_brightness";
     public static final String PREF_GESTURE_TRAIL_COLOR_HUE_STEP = "gesture_trail_color_hue_step";
     public static final String PREF_SHOW_SETUP_WIZARD_ICON = "show_setup_wizard_icon";
     public static final String PREF_USE_CONTACTS = "use_contacts";

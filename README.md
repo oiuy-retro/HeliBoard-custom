@@ -109,9 +109,11 @@ The `?123` page now has 4 rows instead of 5:
   configured angle step (default `138°`, matching the golden angle ~`137.5°`): light teal (`#80CBC4`),
   rose (`#CB80BB`), sage green (`#A5CB80`), periwinkle (`#808ECB`), coral (`#CB8880`), mint (`#80CB9E`),
   lavender (`#B580CB`), soft yellow (`#CBC480`), sky blue (`#80B6CB`), pink (`#CB80A0`) and so on.
-- **Saturation and angle step sliders** (Settings → Gesture typing, shown when the gesture trail is on):
-  - **Gesture trail color saturation**: `0 %` – `100 %` (`1 %` steps, default **`37 %`** matching OpenBoard's `#80CBC4`).
-  - **Gesture trail color angle step**: `0°` – `180°` (`1°` steps, default **`138°`** matching the golden angle; `0°` keeps the default teal hue on every swipe).
+- **Saturation, brightness and angle step sliders** (Settings → Gesture typing, shown when the gesture
+  trail is on, using smooth slider tracks like the rest of HeliBoard's settings):
+  - **Gesture trail color saturation**: `0 %` – `100 %` (default **`37 %`** matching OpenBoard's `#80CBC4`).
+  - **Gesture trail color brightness**: `0 %` – `100 %` (default **`80 %`** matching `#80CBC4`'s HSV value `203 / 255 ≈ 79.6 %`).
+  - **Gesture trail color angle step**: `0°` – `180°` (default **`138°`** matching the golden angle; `0°` keeps the default teal hue on every swipe).
 - **Lingering trails keep their own color.** Each trail point stores the color of the swipe that drew
   it. When several trails remain on screen at once (with a long lifespan), older strokes keep the color
   they were swiped with while they fade out instead of switching to the new swipe's color.

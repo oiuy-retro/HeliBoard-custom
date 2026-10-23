@@ -29,23 +29,33 @@ final class GestureTrailDrawingPoints {
     public static final int POINT_TYPE_SAMPLED = 1;
     public static final int POINT_TYPE_INTERPOLATED = 2;
 
-    // Default OpenBoard/Material Teal 200 (#80CBC4) in HSV: H = 174.4°, S = 37% (0.37), V = 0.796.
-    // Every new gesture stroke advances the hue by the configured angle step (default 138°, matching
-    // the golden angle ~137.5°) while using the configured saturation (0..100%) and light value V.
+    // Default OpenBoard/Material Teal 200 (#80CBC4) in HSV: H = 174.4°, S = 37% (0.37),
+    // V = 203/255 ≈ 79.6% (default slider 80%). Every new gesture stroke advances the hue by the
+    // configured angle step (default 138°, matching the golden angle ~137.5°) while using the
+    // configured saturation (0..100%) and brightness/value (0..100%).
     static final float DEFAULT_TEAL_HUE = 174.4f;
-    static final float TRAIL_VALUE = 0.796f;
+    static final float DEFAULT_TRAIL_VALUE = 203.0f / 255.0f;
 
     private static int sNextStrokeColorIndex = 0;
 
     static synchronized int nextTrailColor() {
         return nextTrailColor(
                 Defaults.PREF_GESTURE_TRAIL_COLOR_SATURATION,
+                Defaults.PREF_GESTURE_TRAIL_COLOR_BRIGHTNESS,
                 Defaults.PREF_GESTURE_TRAIL_COLOR_HUE_STEP);
     }
 
     static synchronized int nextTrailColor(final int saturationPercent, final int hueStepDegrees) {
+        return nextTrailColor(
+                saturationPercent,
+                Defaults.PREF_GESTURE_TRAIL_COLOR_BRIGHTNESS,
+                hueStepDegrees);
+    }
+
+    static synchronized int nextTrailColor(final int saturationPercent,
+            final int brightnessPercent, final int hueStepDegrees) {
         final int color = getTrailColorForIndex(
-                sNextStrokeColorIndex, saturationPercent, hueStepDegrees);
+                sNextStrokeColorIndex, saturationPercent, brightnessPercent, hueStepDegrees);
         sNextStrokeColorIndex++;
         return color;
     }
@@ -58,15 +68,28 @@ final class GestureTrailDrawingPoints {
         return getTrailColorForIndex(
                 index,
                 Defaults.PREF_GESTURE_TRAIL_COLOR_SATURATION,
+                Defaults.PREF_GESTURE_TRAIL_COLOR_BRIGHTNESS,
                 Defaults.PREF_GESTURE_TRAIL_COLOR_HUE_STEP);
     }
 
     static int getTrailColorForIndex(final int index, final int saturationPercent,
             final int hueStepDegrees) {
+        return getTrailColorForIndex(
+                index,
+                saturationPercent,
+                Defaults.PREF_GESTURE_TRAIL_COLOR_BRIGHTNESS,
+                hueStepDegrees);
+    }
+
+    static int getTrailColorForIndex(final int index, final int saturationPercent,
+            final int brightnessPercent, final int hueStepDegrees) {
         final int clampedStep = Math.max(0, Math.min(360, hueStepDegrees));
         final float saturation = Math.max(0.0f, Math.min(1.0f, saturationPercent / 100.0f));
+        final float value = (brightnessPercent == Defaults.PREF_GESTURE_TRAIL_COLOR_BRIGHTNESS)
+                ? DEFAULT_TRAIL_VALUE
+                : Math.max(0.0f, Math.min(1.0f, brightnessPercent / 100.0f));
         final float hue = (DEFAULT_TEAL_HUE + (index & 0x7fffffff) * (float)clampedStep) % 360.0f;
-        return hsvToColor(0xFF, hue, saturation, TRAIL_VALUE);
+        return hsvToColor(0xFF, hue, saturation, value);
     }
 
     static int hsvToColor(final int alpha, final float hue, final float saturation,
@@ -144,6 +167,7 @@ final class GestureTrailDrawingPoints {
     public void addStroke(final GestureStrokeDrawingPoints stroke, final long downTime) {
         addStroke(stroke, downTime,
                 Defaults.PREF_GESTURE_TRAIL_COLOR_SATURATION,
+                Defaults.PREF_GESTURE_TRAIL_COLOR_BRIGHTNESS,
                 Defaults.PREF_GESTURE_TRAIL_COLOR_HUE_STEP);
     }
 
@@ -152,21 +176,30 @@ final class GestureTrailDrawingPoints {
         final int saturation = (params != null)
                 ? params.mTrailColorSaturation
                 : Defaults.PREF_GESTURE_TRAIL_COLOR_SATURATION;
+        final int brightness = (params != null)
+                ? params.mTrailColorBrightness
+                : Defaults.PREF_GESTURE_TRAIL_COLOR_BRIGHTNESS;
         final int hueStep = (params != null)
                 ? params.mTrailColorHueStep
                 : Defaults.PREF_GESTURE_TRAIL_COLOR_HUE_STEP;
-        addStroke(stroke, downTime, saturation, hueStep);
+        addStroke(stroke, downTime, saturation, brightness, hueStep);
     }
 
     public void addStroke(final GestureStrokeDrawingPoints stroke, final long downTime,
             final int saturationPercent, final int hueStepDegrees) {
+        addStroke(stroke, downTime, saturationPercent,
+                Defaults.PREF_GESTURE_TRAIL_COLOR_BRIGHTNESS, hueStepDegrees);
+    }
+
+    public void addStroke(final GestureStrokeDrawingPoints stroke, final long downTime,
+            final int saturationPercent, final int brightnessPercent, final int hueStepDegrees) {
         synchronized (mEventTimes) {
-            addStrokeLocked(stroke, downTime, saturationPercent, hueStepDegrees);
+            addStrokeLocked(stroke, downTime, saturationPercent, brightnessPercent, hueStepDegrees);
         }
     }
 
     private void addStrokeLocked(final GestureStrokeDrawingPoints stroke, final long downTime,
-            final int saturationPercent, final int hueStepDegrees) {
+            final int saturationPercent, final int brightnessPercent, final int hueStepDegrees) {
         final int trailSize = mEventTimes.getLength();
         stroke.appendPreviewStroke(mEventTimes, mXCoordinates, mYCoordinates, mPointTypes);
         if (mEventTimes.getLength() == trailSize) {
@@ -196,7 +229,8 @@ final class GestureTrailDrawingPoints {
             xCoords[trailSize] = markAsDownEvent(xCoords[trailSize]);
             mCurrentTimeBase = downTime - eventTimes[trailSize];
             mCurrentStrokeId = strokeId;
-            mCurrentStrokeColor = nextTrailColor(saturationPercent, hueStepDegrees);
+            mCurrentStrokeColor = nextTrailColor(
+                    saturationPercent, brightnessPercent, hueStepDegrees);
         }
         final int newTrailSize = mEventTimes.getLength();
         if (newTrailSize > lastInterpolatedIndex) {

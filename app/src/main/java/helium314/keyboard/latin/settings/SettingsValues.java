@@ -114,6 +114,7 @@ public class SettingsValues {
     public final int mGestureFastTypingCooldown;
     public final int mGestureTrailFadeoutDuration;
     public final int mGestureTrailColorSaturation;
+    public final int mGestureTrailColorBrightness;
     public final int mGestureTrailColorHueStep;
     public final boolean mSlidingKeyInputPreviewEnabled;
     public final int mKeyLongpressTimeout;
@@ -266,6 +267,7 @@ public class SettingsValues {
         mGestureFastTypingCooldown = prefs.getInt(Settings.PREF_GESTURE_FAST_TYPING_COOLDOWN, Defaults.PREF_GESTURE_FAST_TYPING_COOLDOWN);
         mGestureTrailFadeoutDuration = prefs.getInt(Settings.PREF_GESTURE_TRAIL_FADEOUT_DURATION, Defaults.PREF_GESTURE_TRAIL_FADEOUT_DURATION);
         mGestureTrailColorSaturation = prefs.getInt(Settings.PREF_GESTURE_TRAIL_COLOR_SATURATION, Defaults.PREF_GESTURE_TRAIL_COLOR_SATURATION);
+        mGestureTrailColorBrightness = prefs.getInt(Settings.PREF_GESTURE_TRAIL_COLOR_BRIGHTNESS, Defaults.PREF_GESTURE_TRAIL_COLOR_BRIGHTNESS);
         mGestureTrailColorHueStep = prefs.getInt(Settings.PREF_GESTURE_TRAIL_COLOR_HUE_STEP, Defaults.PREF_GESTURE_TRAIL_COLOR_HUE_STEP);
         mSuggestionStripHiddenPerUserSettings = mToolbarMode == ToolbarMode.HIDDEN || mToolbarMode == ToolbarMode.TOOLBAR_KEYS;
         mOverrideShowingSuggestions = mInputAttributes.mMayOverrideShowingSuggestions

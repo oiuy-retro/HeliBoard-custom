@@ -35,6 +35,7 @@ final class GestureTrailDrawingParams {
     public final int mFadeoutDuration;
     public final int mUpdateInterval;
     public final int mTrailColorSaturation;
+    public final int mTrailColorBrightness;
     public final int mTrailColorHueStep;
 
     public final int mTrailLingerDuration;
@@ -52,6 +53,7 @@ final class GestureTrailDrawingParams {
         this(trailColor, trailStartWidth, trailEndWidth, trailBodyRatio, trailShadowEnabled,
                 trailShadowRatio, fadeoutStartDelay, fadeoutDuration, updateInterval,
                 Defaults.PREF_GESTURE_TRAIL_COLOR_SATURATION,
+                Defaults.PREF_GESTURE_TRAIL_COLOR_BRIGHTNESS,
                 Defaults.PREF_GESTURE_TRAIL_COLOR_HUE_STEP);
     }
 
@@ -67,6 +69,26 @@ final class GestureTrailDrawingParams {
             final int updateInterval,
             final int trailColorSaturation,
             final int trailColorHueStep) {
+        this(trailColor, trailStartWidth, trailEndWidth, trailBodyRatio, trailShadowEnabled,
+                trailShadowRatio, fadeoutStartDelay, fadeoutDuration, updateInterval,
+                trailColorSaturation,
+                Defaults.PREF_GESTURE_TRAIL_COLOR_BRIGHTNESS,
+                trailColorHueStep);
+    }
+
+    GestureTrailDrawingParams(
+            final int trailColor,
+            final float trailStartWidth,
+            final float trailEndWidth,
+            final float trailBodyRatio,
+            final boolean trailShadowEnabled,
+            final float trailShadowRatio,
+            final int fadeoutStartDelay,
+            final int fadeoutDuration,
+            final int updateInterval,
+            final int trailColorSaturation,
+            final int trailColorBrightness,
+            final int trailColorHueStep) {
         mTrailColor = trailColor;
         mTrailStartWidth = trailStartWidth;
         mTrailEndWidth = trailEndWidth;
@@ -78,6 +100,7 @@ final class GestureTrailDrawingParams {
         mTrailLingerDuration = mFadeoutStartDelay + mFadeoutDuration;
         mUpdateInterval = updateInterval;
         mTrailColorSaturation = trailColorSaturation;
+        mTrailColorBrightness = trailColorBrightness;
         mTrailColorHueStep = trailColorHueStep;
     }
 
@@ -107,6 +130,7 @@ final class GestureTrailDrawingParams {
         mUpdateInterval = mainKeyboardViewAttr.getInt(
                 R.styleable.MainKeyboardView_gestureTrailUpdateInterval, 0);
         mTrailColorSaturation = sv.mGestureTrailColorSaturation;
+        mTrailColorBrightness = sv.mGestureTrailColorBrightness;
         mTrailColorHueStep = sv.mGestureTrailColorHueStep;
     }
 }

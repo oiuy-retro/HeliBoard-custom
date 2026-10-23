@@ -206,6 +206,8 @@
     <string name="gesture_trail_fadeout_duration">Gesture trail lifespan</string>
     <!-- Title of the setting to adjust the gesture trail color saturation -->
     <string name="gesture_trail_color_saturation">Gesture trail color saturation</string>
+    <!-- Title of the setting to adjust the gesture trail color brightness -->
+    <string name="gesture_trail_color_brightness">Gesture trail color brightness</string>
     <!-- Title of the setting to adjust the gesture trail color angle step between swipes -->
     <string name="gesture_trail_color_hue_step">Gesture trail color angle step</string>
     <!-- Preferences item for enabling clipboard history -->

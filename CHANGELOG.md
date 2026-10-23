@@ -14,6 +14,8 @@ builds with the package `helium314.keyboard.custom`. The earlier test build was 
 ## [custom-v4] - 2026-10-23
 
 ### Added
+- **Gesture trail color brightness** slider in Settings → Gesture typing (`0 %` – `100 %`, default `80 %`
+  matching `#80CBC4`'s HSV value `203 / 255 ≈ 79.6 %`).
 - **Default tick mark on all settings sliders:** every slider in Settings (`SliderPreference`, the
   gesture trail lifespan slider, and `KeyboardScalePreference` dialogs) draws a vertical tick mark on the
   track at the position of its default value.
@@ -22,6 +24,8 @@ builds with the package `helium314.keyboard.custom`. The earlier test build was 
   a noticeably stronger haptic pulse (`28 ms`, full amplitude `255`) when snapping onto the default value.
 
 ### Changed
+- Gesture trail color sliders (`saturation`, `brightness` and `angle step`) use smooth slider tracks
+  without `stepSize` tick dots, matching all other settings sliders in HeliBoard.
 - `versionCode` bumped from `4302` to `4303` so `custom-v4` installs cleanly as an update over
   `custom-v3`.
 

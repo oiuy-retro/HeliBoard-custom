@@ -62,6 +62,8 @@ fun GestureTypingScreen(
         if (gestureEnabled && gestureTrailEnabled)
             Settings.PREF_GESTURE_TRAIL_COLOR_SATURATION else null,
         if (gestureEnabled && gestureTrailEnabled)
+            Settings.PREF_GESTURE_TRAIL_COLOR_BRIGHTNESS else null,
+        if (gestureEnabled && gestureTrailEnabled)
             Settings.PREF_GESTURE_TRAIL_COLOR_HUE_STEP else null,
     )
     SearchSettingsScreen(
@@ -121,7 +123,15 @@ fun createGestureTypingSettings(context: Context) = listOf(
             key = def.key,
             default = Defaults.PREF_GESTURE_TRAIL_COLOR_SATURATION,
             range = 0f..100f,
-            stepSize = 1,
+            description = { "$it%" }
+        ) { KeyboardSwitcher.getInstance().setThemeNeedsReload() }
+    },
+    Setting(context, Settings.PREF_GESTURE_TRAIL_COLOR_BRIGHTNESS, R.string.gesture_trail_color_brightness) { def ->
+        SliderPreference(
+            name = def.title,
+            key = def.key,
+            default = Defaults.PREF_GESTURE_TRAIL_COLOR_BRIGHTNESS,
+            range = 0f..100f,
             description = { "$it%" }
         ) { KeyboardSwitcher.getInstance().setThemeNeedsReload() }
     },
@@ -131,7 +141,6 @@ fun createGestureTypingSettings(context: Context) = listOf(
             key = def.key,
             default = Defaults.PREF_GESTURE_TRAIL_COLOR_HUE_STEP,
             range = 0f..180f,
-            stepSize = 1,
             description = { "$it°" }
         ) { KeyboardSwitcher.getInstance().setThemeNeedsReload() }
     },
