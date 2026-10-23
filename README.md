@@ -13,7 +13,7 @@ A personal build of the HeliBoard keyboard with an OpenBoard-style suggestion st
 > original README is at <https://github.com/HeliBorg/HeliBoard/blob/main/README.md>.
 
 - Based on upstream `main` at commit `e97acdbe` (the `v4.3-beta1` tag, 2026-10-18).
-- App version: **4.3-beta1**, versionCode **4302** (upstream is 4300).
+- App version: **4.3-beta1**, versionCode **4303** (upstream is 4300).
 - Package name **`helium314.keyboard.custom`**, app name **HeliBoard Custom**.
 - Published builds are **release** builds, signed with this build's own key (see Signing).
 - See [CHANGELOG.md](CHANGELOG.md) for the history of the custom releases.
@@ -124,13 +124,16 @@ The `?123` page now has 4 rows instead of 5:
 - While a trail is visible the keyboard redraws it about 50 times a second (same as upstream). A very
   long lifespan therefore keeps that redraw going longer and uses a bit more battery.
 
-### 7. Settings sliders snap and vibrate at their default value
+### 7. Settings sliders show a default tick mark, tick on every step, and snap to default
 
-- Every settings slider (`SliderPreference`, the non-linear gesture trail lifespan slider, and the
-  multi-slider `KeyboardScalePreference` dialogs) **snaps to its default value** when dragged within
-  `±2 %` of the slider's span around the default.
-- When the slider lands on the default value while being dragged, the phone gives a **short haptic tick**
-  (once on entering the default, so it doesn't buzz repeatedly while held there).
+- **Visual default tick mark:** Every settings slider (`SliderPreference`, the non-linear gesture trail
+  lifespan slider, and the multi-slider `KeyboardScalePreference` dialogs) draws a vertical tick mark on
+  the slider track at the exact position of its default value.
+- **Light tick on every step change:** Dragging a slider gives a subtle haptic tick (`5 ms` light pulse)
+  whenever the displayed value changes by `1` unit (`1 %`, `1°`, `1 ms` or `1` step).
+- **Snap and stronger tick at the default value:** Sliders snap to their default value within `±2 %` of
+  the slider's span and give a noticeably stronger haptic pulse (`28 ms` full-amplitude pulse) when
+  landing on the default.
 
 ### Existing settings
 

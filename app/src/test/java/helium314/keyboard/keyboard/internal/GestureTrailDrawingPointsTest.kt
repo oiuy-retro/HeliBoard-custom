@@ -6,6 +6,8 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.Rect
 import android.os.SystemClock
+import helium314.keyboard.settings.dialogs.computeDefaultTickFraction
+import helium314.keyboard.settings.dialogs.defaultSliderStepValue
 import helium314.keyboard.settings.dialogs.snapSliderValueToDefault
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -14,6 +16,7 @@ import org.robolectric.shadows.ShadowSystemClock
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 @RunWith(RobolectricTestRunner::class)
@@ -65,14 +68,27 @@ class GestureTrailDrawingPointsTest {
     }
 
     @Test
-    fun `slider snaps to default value within snap window`() {
+    fun `slider snaps to default value and computes tick mark and step values`() {
         // 0..100 range with default 37: 2% window is [35, 39]
         assertEquals(37f, snapSliderValueToDefault(36f, 37f, 0f..100f))
         assertEquals(37f, snapSliderValueToDefault(38.5f, 37f, 0f..100f))
         assertEquals(30f, snapSliderValueToDefault(30f, 37f, 0f..100f))
 
-        // Out-of-range default (e.g. 0 on 21..36) does not snap
+        // Out-of-range default (e.g. 0 on 21..36) does not snap and has no tick mark
         assertEquals(21f, snapSliderValueToDefault(21f, 0f, 21f..36f))
+        assertNull(computeDefaultTickFraction(0f, 21f..36f))
+        assertNull(computeDefaultTickFraction(null, 0f..100f))
+
+        // Tick mark fraction for valid defaults
+        assertEquals(0.37f, computeDefaultTickFraction(37f, 0f..100f)!!, 0.0001f)
+        assertEquals(138f / 180f, computeDefaultTickFraction(138f, 0f..180f)!!, 0.0001f)
+        assertEquals(0.5f, computeDefaultTickFraction(1.0f, 0.5f..1.5f)!!, 0.0001f)
+
+        // Step quantization: integer ranges step by 1, small float scale ranges step by 1% (0.01)
+        assertEquals(37, defaultSliderStepValue(37.2f, 0f..100f))
+        assertEquals(38, defaultSliderStepValue(37.8f, 0f..100f))
+        assertEquals(100, defaultSliderStepValue(1.00f, 0.5f..1.5f))
+        assertEquals(101, defaultSliderStepValue(1.01f, 0.5f..1.5f))
     }
 
     @Test

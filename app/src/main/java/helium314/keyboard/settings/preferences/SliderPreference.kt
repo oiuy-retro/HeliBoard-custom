@@ -66,6 +66,9 @@ fun <T: Number> SliderPreference(
             isDefaultValue = { pos ->
                 default.toFloat() in range && if (default is Int) pos.roundToInt() == default else pos == default.toFloat()
             },
+            stepValue = { pos ->
+                if (default is Int) pos.roundToInt() else (pos * 100f).roundToInt()
+            },
             positionString = {
                 @Suppress("UNCHECKED_CAST")
                 description((if (default is Int) it.roundToInt() else it) as T)

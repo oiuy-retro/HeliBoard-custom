@@ -180,6 +180,7 @@ private fun GestureTrailLifespanPreference(name: String, key: String) {
             range = 0f..1f,
             defaultValue = defaultPosition,
             isDefaultValue = { trailFadeoutFromPosition(it) == Defaults.PREF_GESTURE_TRAIL_FADEOUT_DURATION },
+            stepValue = { trailFadeoutFromPosition(it) },
             positionString = {
                 stringResource(R.string.abbreviation_unit_milliseconds, (trailFadeoutFromPosition(it) + 100).toString())
             },

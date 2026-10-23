@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -40,10 +41,13 @@ import helium314.keyboard.latin.utils.prefs
 import helium314.keyboard.latin.utils.Theme
 import helium314.keyboard.settings.WithSmallTitle
 import helium314.keyboard.settings.dialogs.ThreeButtonAlertDialog
+import helium314.keyboard.settings.dialogs.drawDefaultTickMark
 import helium314.keyboard.settings.dialogs.performSliderDefaultSnapHaptic
+import helium314.keyboard.settings.dialogs.performSliderStepHaptic
 import helium314.keyboard.settings.dialogs.snapSliderValueToDefault
 import helium314.keyboard.latin.utils.previewDark
 import androidx.core.content.edit
+import kotlin.math.roundToInt
 
 // actual key for each setting is baseKey with one _true/_false appended per dimension (need to keep order!)
 // should dimension checkboxes have any other effect than just showing / hiding sliders?
@@ -99,6 +103,7 @@ private fun KeyboardScaleDialog(
     var checked by remember { mutableStateOf(dimensions.map { FoldableUtils.isFoldable || !it.contains(foldedString) }) }
     val prefs = ctx.prefs()
     val done = remember { mutableMapOf<String, () -> Unit>() }
+    val tickColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
 
     ThreeButtonAlertDialog(
         onDismissRequest = onDismissRequest,
@@ -123,8 +128,10 @@ private fun KeyboardScaleDialog(
                     variants.forEachIndexed { i, variant ->
                         val key = keys[i]
                         val defaultVal = defaultValues[i]
-                        var sliderPosition by remember { mutableFloatStateOf(prefs.getFloat(key, defaultVal)) }
-                        var wasAtDefault by remember { mutableStateOf(sliderPosition == defaultVal) }
+                        val initialVal = prefs.getFloat(key, defaultVal)
+                        var sliderPosition by remember { mutableFloatStateOf(initialVal) }
+                        var wasAtDefault by remember { mutableStateOf(initialVal == defaultVal) }
+                        var lastStepValue by remember { mutableIntStateOf((initialVal * 100f).roundToInt()) }
                         if (!done.contains(variant))
                             done[variant] = {
                                 if (sliderPosition == defaultVal)
@@ -142,13 +149,18 @@ private fun KeyboardScaleDialog(
                                     onValueChange = { raw ->
                                         val snapped = snapSliderValueToDefault(raw, defaultVal, range)
                                         val nowAtDefault = snapped == defaultVal
+                                        val currentStep = (snapped * 100f).roundToInt()
                                         if (nowAtDefault && !wasAtDefault) {
                                             performSliderDefaultSnapHaptic(view)
+                                        } else if (currentStep != lastStepValue) {
+                                            performSliderStepHaptic(view)
                                         }
                                         wasAtDefault = nowAtDefault
+                                        lastStepValue = currentStep
                                         sliderPosition = snapped
                                     },
                                     valueRange = range,
+                                    modifier = Modifier.drawDefaultTickMark(defaultVal, range, tickColor),
                                 )
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
@@ -159,6 +171,7 @@ private fun KeyboardScaleDialog(
                                     TextButton({
                                         sliderPosition = defaultVal
                                         wasAtDefault = true
+                                        lastStepValue = (defaultVal * 100f).roundToInt()
                                     }) { Text(stringResource(R.string.button_default)) }
                                 }
                                 Spacer(Modifier.height(6.dp))

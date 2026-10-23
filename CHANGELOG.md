@@ -4,12 +4,26 @@ All notable changes to this custom build of HeliBoard are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 All custom releases keep upstream's version name **4.3-beta1** (`versionCode` 4300 in `custom-v1`,
-4301 in `custom-v2`, 4302 in `custom-v3`) and are built from upstream `main` at `e97acdbe` (the
-`v4.3-beta1` tag). They're
+4301 in `custom-v2`, 4302 in `custom-v3`, 4303 in `custom-v4`) and are built from upstream `main` at
+`e97acdbe` (the `v4.3-beta1` tag). They're
 published as GitHub prereleases and told apart by their tag. From `custom-v1` on, they're release
 builds with the package `helium314.keyboard.custom`. The earlier test build was a debug build
 (`helium314.keyboard.debug`). For changes in the app itself, see the
 [upstream project](https://github.com/HeliBorg/HeliBoard).
+
+## [custom-v4] - 2026-10-23
+
+### Added
+- **Default tick mark on all settings sliders:** every slider in Settings (`SliderPreference`, the
+  gesture trail lifespan slider, and `KeyboardScalePreference` dialogs) draws a vertical tick mark on the
+  track at the position of its default value.
+- **Per-step light vibration and stronger default-snap vibration:** dragging any settings slider gives a
+  light haptic tick (`5 ms`, amplitude `65`) on every change by 1 unit (`1 %`, `1°`, `1 ms` or 1 step) and
+  a noticeably stronger haptic pulse (`28 ms`, full amplitude `255`) when snapping onto the default value.
+
+### Changed
+- `versionCode` bumped from `4302` to `4303` so `custom-v4` installs cleanly as an update over
+  `custom-v3`.
 
 ## [custom-v3] - 2026-10-23
 
@@ -99,6 +113,7 @@ Debug test build, package `helium314.keyboard.debug`.
 ### Added
 - Unit test `symbols layouts match OpenBoard`.
 
+[custom-v4]: https://github.com/oiuy-retro/HeliBoard-custom/releases/tag/custom-v4
 [custom-v3]: https://github.com/oiuy-retro/HeliBoard-custom/releases/tag/custom-v3
 [custom-v2]: https://github.com/oiuy-retro/HeliBoard-custom/releases/tag/custom-v2
 [custom-v1]: https://github.com/oiuy-retro/HeliBoard-custom/releases/tag/custom-v1
