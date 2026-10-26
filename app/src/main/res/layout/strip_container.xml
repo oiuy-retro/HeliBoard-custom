@@ -25,7 +25,7 @@
         android:layout_height="match_parent"
         style="?attr/suggestionStripViewStyle" />
     <!-- OpenBoard-style clipboard strip: fixed "ABC" key on the left to go back to the letters
-         (like OpenBoard's clipboard_keyboard_alphabet), configurable clipboard toolbar keys on the right -->
+         (like OpenBoard's clipboard_keyboard_alphabet), and only the clear history key on the right (like clipboard_clear) -->
     <LinearLayout
         android:id="@+id/clipboard_strip_container"
         android:orientation="horizontal"

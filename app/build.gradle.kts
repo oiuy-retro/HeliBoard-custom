@@ -23,7 +23,7 @@ android {
         applicationId = "helium314.keyboard.custom" // custom build, installs alongside official HeliBoard (helium314.keyboard)
         minSdk = 21
         targetSdk = 37
-        versionCode = 4303
+        versionCode = 4304
         versionName = "4.3-beta1"
         ndk {
             abiFilters.clear()

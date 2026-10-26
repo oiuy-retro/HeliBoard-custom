@@ -14,7 +14,7 @@ OpenBoard sources matched: `app/src/main/res/layout/suggestions_strip.xml`,
 | File | Change |
 |---|---|
 | `app/src/main/java/helium314/keyboard/latin/settings/Defaults.kt` | `PREF_TOOLBAR_MODE` default `EXPANDABLE` → `SUGGESTION_STRIP`. `PREF_SHOW_DPAD_KEY` default `true` → `false`. |
-| `app/src/main/java/helium314/keyboard/latin/utils/ToolbarUtils.kt` | `defaultPinnedToolbarPref` enables `VOICE` and `CLIPBOARD` (in that order). `defaultClipboardToolbarPref`: `CLEAR_CLIPBOARD` moved to the end, `CLOSE_HISTORY` disabled. |
+| `app/src/main/java/helium314/keyboard/latin/utils/ToolbarUtils.kt` | `defaultPinnedToolbarPref` enables `VOICE` and `CLIPBOARD` (in that order). `defaultClipboardToolbarPref` enables only `CLEAR_CLIPBOARD` (everything else, including `CLOSE_HISTORY`, is disabled). The clipboard view ignores this setting anyway, see section 3. |
 | `app/src/main/java/helium314/keyboard/latin/suggestions/SuggestionStripView.kt` | `updateKeys()`: in `SUGGESTION_STRIP` mode the expand key is `INVISIBLE` instead of `GONE`, so the left slot keeps its width like OpenBoard's `suggestions_strip_other_key`. It still shows the incognito icon. |
 | `app/src/main/res/values-land/config.xml` | `config_suggestions_strip_edge_key_width` 48 dp → 54 dp. |
 | `app/src/main/res/values-sw768dp/config.xml`, `values-sw768dp-land/config.xml` | `config_suggestions_strip_height` 40 dp → 44 dp. |
@@ -49,10 +49,11 @@ clear key on the right, no space or delete keys).
 
 | File | Change |
 |---|---|
-| `app/src/main/res/layout/strip_container.xml` | The clipboard strip's `HorizontalScrollView` is wrapped in a horizontal `LinearLayout` (`clipboard_strip_container`) with a fixed `TextView` (`clipboard_strip_alpha_key`) on the left. `fillViewport` is on, so the toolbar keys sit at the right edge. |
+| `app/src/main/res/layout/strip_container.xml` | The clipboard strip's `HorizontalScrollView` is wrapped in a horizontal `LinearLayout` (`clipboard_strip_container`) with a fixed `TextView` (`clipboard_strip_alpha_key`) on the left. `fillViewport` is on, so the clear history key sits at the right edge. |
 | `app/src/main/java/helium314/keyboard/keyboard/KeyboardSwitcher.java` | Shows and hides `clipboard_strip_container` instead of the scroll view. New getter `getClipboardStripAlphaKey()`. |
 | `app/src/main/java/helium314/keyboard/keyboard/clipboard/ClipboardLayoutParams.kt` | New `withBottomRow` parameter and `showsClipboardBottomRow()` (true only if the secondary strip is hidden). Without the bottom row, the list height is the keyboard height minus the bottom padding. |
-| `app/src/main/java/helium314/keyboard/keyboard/clipboard/ClipboardHistoryView.kt` | `setupBottomRowKeyboard()` still builds the bottom row, but hides it when the strip is visible. The ABC key takes its label from the bottom row's `ALPHA` key (so it's localized), uses the same text size, typeface and color, and sends `KeyCode.ALPHA`. |
+| `app/src/main/java/helium314/keyboard/keyboard/clipboard/ClipboardHistoryView.kt` | `setupBottomRowKeyboard()` still builds the bottom row, but hides it when the strip is visible. The ABC key takes its label from the bottom row's `ALPHA` key (so it's localized), uses the same text size, typeface and color, and sends `KeyCode.ALPHA`. The strip keys no longer come from the "clipboard toolbar keys" setting: `CLIPBOARD_STRIP_KEYS` is fixed to `CLEAR_CLIPBOARD`, so the strip holds only ABC and clear history, like OpenBoard's `clipboard_keyboard_alphabet` and `clipboard_clear`. Stored settings from older versions are ignored. |
+| `app/src/main/java/helium314/keyboard/settings/screens/ToolbarScreen.kt` | The "Select clipboard toolbar keys" setting is no longer listed, since the clipboard strip is fixed. |
 
 The emoji view is not changed. It shares only the bottom-row builder
 (`KeyboardLayoutSet.Builder.buildEmojiClipBottomRow`), which is unchanged.

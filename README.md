@@ -70,10 +70,10 @@ The `?123` page now has 4 rows instead of 5:
   uses the freed space.
 - To go back to the letters, tap the **ABC** key on the left of the strip above the clips. The label
   is the same as on the normal ABC key, so it changes with the language (for example `АБВ`).
-- The **clear history** key is now at the right edge of that strip, as in OpenBoard. The other
-  clipboard toolbar keys (arrows, undo, cut, copy, paste, select word) are still there to its left.
-- The "close" (X) key is no longer shown by default, because the ABC key replaces it. You can turn it
-  back on in Settings → Toolbar → "Select clipboard toolbar keys".
+- The only other key in that strip is **clear history**, at the right edge, as in OpenBoard. It
+  deletes the whole clipboard history. The other clipboard toolbar keys (arrows, undo, cut, copy,
+  paste, select all, select word, close) are gone, and the "Select clipboard toolbar keys" setting
+  is no longer shown, because the strip is fixed.
 - **Edge case:** if Toolbar mode is "Hidden" and "Hide clipboard and emoji toolbars too" is on
   (the default for that option), there is no strip to put the ABC key in. The bottom row then stays,
   so you can still get back to the letters.
@@ -139,10 +139,10 @@ The `?123` page now has 4 rows instead of 5:
 
 ### Existing settings
 
-The toolbar, pinned keys, clipboard toolbar keys and D-pad changes above are new **defaults**. If you
+The toolbar, pinned keys and D-pad changes above are new **defaults**. If you
 restore a backup from official HeliBoard (see Install), any of these settings you had changed there
 come back as you set them. Settings you never changed get this build's defaults. The symbol layouts
-and the clipboard bottom row change apply in any case.
+and the clipboard view changes (no bottom row, only ABC and clear history in the strip) apply in any case.
 
 ## Install
 

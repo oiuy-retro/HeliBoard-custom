@@ -33,10 +33,8 @@ import helium314.keyboard.latin.settings.Settings
 import helium314.keyboard.latin.utils.ResourceUtils
 import helium314.keyboard.latin.utils.ToolbarKey
 import helium314.keyboard.latin.utils.createToolbarKey
-import helium314.keyboard.latin.utils.getEnabledClipboardToolbarKeys
 import helium314.keyboard.latin.utils.onClickToolbarKey
 import helium314.keyboard.latin.utils.onLongClickToolbarKey
-import helium314.keyboard.latin.utils.prefs
 import helium314.keyboard.latin.utils.setToolbarButtonsActivatedStateOnPrefChange
 
 @SuppressLint("CustomViewStyleable")
@@ -69,8 +67,9 @@ class ClipboardHistoryView @JvmOverloads constructor(
         val keyboardViewAttr = context.obtainStyledAttributes(attrs, R.styleable.KeyboardView, defStyle, R.style.KeyboardView)
         keyBackgroundId = keyboardViewAttr.getResourceId(R.styleable.KeyboardView_keyBackground, 0)
         keyboardViewAttr.recycle()
-        getEnabledClipboardToolbarKeys(context.prefs())
-            .forEach { toolbarKeys.add(createToolbarKey(context, it)) }
+        // OpenBoard-style: the clipboard strip only has the "ABC" key (clipboard_strip_alpha_key) and a key
+        // to clear the entire clipboard history, so the configurable clipboard toolbar keys are not used here
+        CLIPBOARD_STRIP_KEYS.forEach { toolbarKeys.add(createToolbarKey(context, it)) }
         fitsSystemWindows = true
     }
 
@@ -270,5 +269,10 @@ class ClipboardHistoryView @JvmOverloads constructor(
             clipboardHistoryManager.sortHistoryEntries()
             clipboardAdapter.notifyDataSetChanged()
         }
+    }
+
+    companion object {
+        /** Keys shown in the clipboard strip next to the "ABC" key, like OpenBoard's clipboard_clear */
+        val CLIPBOARD_STRIP_KEYS = listOf(ToolbarKey.CLEAR_CLIPBOARD)
     }
 }
